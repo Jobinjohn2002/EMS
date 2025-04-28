@@ -1,0 +1,28 @@
+CREATE DATABASE project_estimation;
+USE project_estimation;
+
+CREATE TABLE user (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    status TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO user (email, password) 
+VALUES ('admin@example.com', '$2a$10$YDaOyqP2eH1zphXhdmxfJOV/6EytBvV3gkVTVjTkccVKOZLBy3hhO');
+
+
+
+CREATE TABLE estimation (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  date DATE,
+  status INT,
+  description TEXT,
+  approved_by VARCHAR(255),
+  prepared_by INT NOT NULL,
+  version_no VARCHAR(50),
+  created_at DATETIME,
+  modified_at DATETIME,
+  modified_by INT
+);

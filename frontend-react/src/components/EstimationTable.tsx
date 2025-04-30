@@ -199,10 +199,6 @@ const EstimationTable: React.FC<EstimationTableProps> = ({ projects, refreshProj
 
   return (
     <div className="bg-white rounded-lg shadow overflow-x-auto p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">excelencia</h2>
-        <h3 className="text-md text-gray-600">People THAT I Services Hospitals</h3>
-      </div>
 
       <h2 className="text-lg font-semibold mb-4">Version History</h2>
 
@@ -279,21 +275,6 @@ const EstimationTable: React.FC<EstimationTableProps> = ({ projects, refreshProj
             ))}
           </tbody>
         </table>
-      </div>
-
-      <div className="mt-6">
-        <h3 className="text-md font-medium mb-2">Requirement & Assumption</h3>
-        <div className="flex space-x-4 mb-4">
-          <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
-            Estimation
-          </button>
-          <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
-            Summary
-          </button>
-          <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
-            Billing Milestone
-          </button>
-        </div>
       </div>
 
       <div className="flex justify-end mt-4">

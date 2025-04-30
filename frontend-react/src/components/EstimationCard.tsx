@@ -12,9 +12,14 @@ const EstimationCard: React.FC<EstimationCardProps> = ({ projectName, projectTyp
       <div className="mb-4">
         <img src="/placeholder.png" alt="Project Logo" className="h-20 mx-auto" />
       </div>
-      <h3 className="text-center text-lg font-bold text-blue-700">{projectName}</h3>
-      <p className="text-center text-sm text-gray-500">{projectType}</p>
-      <div className="mt-4 text-center text-xs text-gray-500">
+      <div className="flex items-center justify-between">
+      <h3 className="text-lg font-bold text-blue-700">{projectName}</h3>
+      <button className="bg-transparent border-none outline-none focus:outline-none">
+        <img src="./src/assets/history.svg" alt="history" className="w-5 h-5" />
+      </button>
+      </div>
+      <p className="text-sm text-gray-500">{projectType}</p>
+      <div className="mt-4 text-xs text-gray-500">
         <p>👤 {managerName}</p>
       </div>
     </div>

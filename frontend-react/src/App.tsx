@@ -1,18 +1,24 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
+// src/App.tsx
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
-import ProtectedRoute from "./routes/ProtectedRoute";
-import Toast from "./components/Toast";
+import RequirementsPage from "./pages/RequirementsPage";
+import ProjectDetailsPage from "./pages/ProjectDetailsPage";
 
-export default function App() {
+function App() {
   return (
     <Router>
-      <Toast />
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<ProtectedRoute><LandingPage /></ProtectedRoute>} />
-        {/* <Route path="/" element={<LandingPage />} /> */}
+        {/* Home/Landing */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Static Requirements Page */}
+        <Route path="/requirements" element={<RequirementsPage />} />
+
+        {/* Project Details Page */}
+        <Route path="/project/:projectId" element={<ProjectDetailsPage />} />
       </Routes>
     </Router>
   );
 }
+
+export default App;

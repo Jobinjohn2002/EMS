@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import RequirementsPage from "./pages/RequirementsPage";
 import ProjectDetailsPage from "./pages/ProjectDetailsPage";
+import VersionPage from "./pages/VersionPage";
+
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
 
         {/* Project Details Page */}
         <Route path="/project/:projectId" element={<ProjectDetailsPage />} />
+        <Route path="/version-history" element={<VersionPage />} />
       </Routes>
     </Router>
   );

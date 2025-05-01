@@ -1,6 +1,6 @@
 // src/components/EstimationModal.tsx
 import React, { useState } from 'react';
-import { EstimationModel } from '../models/EstimationModal';
+import { EstimationModel } from '../models/EstimationModel';
 import { estimationService } from '../services/estimationService';
 
 interface EstimationModalProps {

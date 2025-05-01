@@ -1,3 +1,4 @@
+import { Estimation } from '../models/Estimation';
 import { EstimationModel } from '../models/EstimationModel';
 import API from './api';
 
@@ -14,6 +15,10 @@ getAll: async (): Promise<EstimationModel[]> => {
   },
   
   create: async (estimation: Omit<EstimationModel, 'id'>): Promise<EstimationModel> => {
+    const response = await API.post('/estimation', estimation);
+    return response.data;
+  },
+  createEstimation: async (estimation: Omit<Estimation, 'id'>): Promise<Estimation> => {
     const response = await API.post('/estimation', estimation);
     return response.data;
   },

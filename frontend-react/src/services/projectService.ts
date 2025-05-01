@@ -1,4 +1,4 @@
-import { ProjectModel } from '../models/ProjectModel';
+import { ProjectModel } from '../models/Project';
 import API from './api';
 
 export const projectService = {

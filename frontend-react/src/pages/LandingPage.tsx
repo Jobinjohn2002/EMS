@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EstimationCard from "../components/EstimationCard";
 import { estimationService } from "../services/estimationService";
-import { EstimationModel } from "../models/EstimationModel";
+import { EstimationModel } from "../models/EstimationModel"; 
 import simLogo from "../assets/sim.png";
 import hilLogo from "../assets/hil.png";
 import csLogo from "../assets/cs.png";
@@ -13,6 +13,34 @@ import Header from "../components/Header";
 import { projectService } from "../services/projectService";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
+// Define Omit type manually if not using type-fest (or import from type-fest)
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
+// Import your frontend Estimation model
+import { Estimation as FrontendEstimation } from '../models/Estimation';
+
+// Define the type for the data payload expected by the backend create endpoint
+// This is based on your frontend model, omitting backend-managed fields
+type CreateEstimationPayload = Omit<FrontendEstimation, 'id' | 'createdAt' | 'modifiedAt' | 'modifiedBy'>;
+
+
+// Define types for dropdown options for clarity
+interface ProjectOption {
+  id: number;
+  name: string;
+}
+
+interface StatusOption {
+  id: number;
+  label: string;
+}
+
+interface UserOption {
+  id: number;
+  label: string; // Or maybe 'name', depends on your data structure
+}
+
 
 const mockData = [
   {
@@ -64,80 +92,141 @@ const LandingPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [dropdownProjects, setDropdownProjects] = useState<
-    { id: number; name: string }[]
-  >([]);
-  const statusOptions = [
+
+  const [selectedProject, setSelectedProject] = useState<number | null>(null);
+  const [versionNo, setVersionNo] = useState<string>('');
+  const [approvedBy, setApprovedBy] = useState<string>('');
+  const [selectedStatus, setSelectedStatus] = useState<number | null>(null);
+  // Note: 'preparedBy' is NOT nullable in your frontend model either.
+  // We'll use null for state initially, but validate before saving.
+  const [selectedPreparedBy, setSelectedPreparedBy] = useState<number | null>(null);
+  const [description, setDescription] = useState<string>('');
+
+
+  const [dropdownProjects, setDropdownProjects] = useState<ProjectOption[]>([]);
+  const statusOptions: StatusOption[] = [
     { id: 1, label: "Pending" },
     { id: 2, label: "Approved" },
   ];
-  const preparedByOptions = [
+  const preparedByOptions: UserOption[] = [
     { id: 1, label: "Vijay" },
     { id: 2, label: "Jagadish" },
     { id: 3, label: "Jobin" },
   ];
-  // const togglePopup = (): void => {
-  //   setIsOpen(!isOpen);
-  // };
 
   const refreshProjects = async () => {
     setLoading(true);
     try {
-      const data = await estimationService.getAll();
-      setProjects(data);
+      console.log("refreshProjects called, but currently using mockData for display.");
     } catch (error) {
       console.error("Error fetching projects:", error);
     } finally {
       setLoading(false);
     }
   };
-  const handleSave = async () => {
+
+  // Handles saving the form data using the frontend model types
+  const handleSave = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    // Validation based on the frontend model: preparedBy is required (number)
+    if (selectedPreparedBy === null) {
+      alert('Prepared by is required.');
+      return;
+    }
+
+    // Prepare the data payload matching the frontend CreateEstimationPayload type
+    const estimationData: CreateEstimationPayload = {
+      projectId: selectedProject ?? undefined, 
+      versionNo: versionNo || undefined, 
+      date: selectedDate ? selectedDate.toISOString().split('T')[0] : undefined, 
+      approvedBy: approvedBy || undefined, 
+      status: selectedStatus ?? undefined, 
+      preparedBy: selectedPreparedBy, 
+      description: description || undefined, 
+      // id, createdAt, modifiedAt, modifiedBy are omitted as per CreateEstimationPayload type
+    };
+
+    console.log('Attempting to save estimation:', estimationData);
+
     try {
+      const savedEstimation = await estimationService.createEstimation(estimationData);
+
+      console.log('Estimation saved successfully:', savedEstimation);
+
+      // Reset form state to initial values
+      setSelectedProject(null);
+      setVersionNo('');
+      setSelectedDate(null);
+      setApprovedBy('');
+      setSelectedStatus(null);
+      setSelectedPreparedBy(null);
+      setDescription('');
+
+      togglePopup();
+
+      alert('Estimation saved successfully!');
       navigate("/version-history");
+
+
     } catch (error) {
-      console.error("Save failed:", error);
+      console.error('Error saving estimation:', error);
+      // --- Handle error ---
+      // Show an error message to the user
+      alert(`Failed to save estimation. Please try again.\nError: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
   useEffect(() => {
-    refreshProjects();
-
-    // projectService.getAll().then((data) => {
-    //   const mappedProjects = data
-    //     .filter((project) => project.id !== undefined)
-    //     .map((project) => ({
-    //       id: project.id as number,
-    //       name: project.projectName,
-    //     }));
-
-    //   setDropdownProjects(mappedProjects);
-    // }).catch((error) => {
-    //   console.error("Failed to load dropdown projects", error);
-    // });
+    projectService
+      .getAll()
+      .then((data) => {
+        const mappedProjects = data
+          .filter((project) => project.id !== undefined)
+          .map((project) => ({
+            id: project.id as number,
+            name: project.projectName,
+          }));
+        setDropdownProjects(mappedProjects);
+      })
+      .catch((error) => {
+        console.error("Failed to load dropdown projects", error);
+        setDropdownProjects([]);
+      });
   }, []);
+
 
   const togglePopup = (): void => {
     setIsOpen(!isOpen);
 
-    // Only fetch projects when the popup is opened
-    if (!isOpen) {
-      projectService
-        .getAll()
-        .then((data) => {
-          const mappedProjects = data
-            .filter((project) => project.id !== undefined) // Filter out projects with undefined id
-            .map((project) => ({
-              id: project.id as number,
-              name: project.projectName,
-            }));
-
-          setDropdownProjects(mappedProjects);
-        })
-        .catch((error) => {
-          console.error("Failed to load dropdown projects", error);
-        });
+    if (isOpen) {
+        setSelectedProject(null);
+        setVersionNo('');
+        setSelectedDate(null);
+        setApprovedBy('');
+        setSelectedStatus(null);
+        setSelectedPreparedBy(null);
+        setDescription('');
     }
+    if (!isOpen && dropdownProjects.length === 0) {
+       projectService
+         .getAll()
+         .then((data) => {
+           const mappedProjects = data
+             .filter((project) => project.id !== undefined)
+             .map((project) => ({
+               id: project.id as number,
+               name: project.projectName,
+             }));
+           setDropdownProjects(mappedProjects);
+         })
+         .catch((error) => {
+           console.error("Failed to load dropdown projects", error);
+           setDropdownProjects([]);
+         });
+     }
   };
+
 
   const handleDelete = (id: number) => {
     console.log("Deleting project with id", id);
@@ -160,82 +249,93 @@ const LandingPage: React.FC = () => {
         {isOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div
-              className="bg-white rounded-xl p-6 shadow-lg relative w-96"
+              className="bg-white rounded-xl p-6 shadow-lg relative w-96 max-h-[90vh] overflow-y-auto"
               style={{ width: "60%" }}
             >
               <h2 className="text-2xl font-semibold text-gray-800 mb-6">
                 Version
               </h2>
 
-              <form>
+              <form onSubmit={handleSave}>
                 <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="projectSelect" className="block text-sm font-medium text-gray-700">
                       Projects
                     </label>
-                    <select className="text-sm py-1 mt-1 block w-full h-8 p-2 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                      <option>Select Projects</option>
-                      {dropdownProjects.map((proj) => (
-                        <option key={proj.id} value={proj.id}>
-                          {proj.name}
-                        </option>
-                      ))}
+                    <select
+                      id="projectSelect"
+                      value={selectedProject ?? ''}
+                      onChange={(e) => setSelectedProject(e.target.value ? parseInt(e.target.value, 10) : null)}
+                      className="text-sm py-1 mt-1 block w-full h-8 p-2 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    >
+                      <option value="">Select Projects</option>
+                      {dropdownProjects.length > 0 ? (
+                        dropdownProjects.map((proj) => (
+                          <option key={proj.id} value={proj.id}>
+                            {proj.name}
+                          </option>
+                        ))
+                      ) : (
+                         <option value="" disabled>Loading projects...</option>
+                      )}
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="versionInput" className="block text-sm font-medium text-gray-700">
                       Version No
                     </label>
                     <input
+                      id="versionInput"
                       type="text"
+                      value={versionNo}
+                      onChange={(e) => setVersionNo(e.target.value)}
                       className="text-sm py-1 mt-1 h-8 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     />
                   </div>
 
-                  {/* <div>
-                    <label className="block text-sm font-medium text-gray-700">Date</label>
-                    <input
-                      type="text"
-                      placeholder="MM/DD/YYYY"
-                      className="text-sm py-1 mt-1 h-8 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    />
-                  </div> */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="datePickerInput" className="block text-sm font-medium text-gray-700">
                       Date
                     </label>
                     <DatePicker
+                      id="datePickerInput"
                       selected={selectedDate}
                       onChange={(date: Date | null) => setSelectedDate(date)}
                       dateFormat="MM/dd/yyyy"
                       placeholderText="MM/DD/YYYY"
-                      // Enable Month and Year dropdowns
                       showMonthDropdown
                       showYearDropdown
-                      dropdownMode="select" // Use native select elements
-                      // Apply Tailwind classes to the input part
+                      dropdownMode="select"
                       className="text-sm py-1 mt-1 h-8 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                      // Add a custom class to the calendar popup wrapper
                       calendarClassName="tailwind-datepicker"
                     />
                   </div>
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="approvedByInput" className="block text-sm font-medium text-gray-700">
                       Approved by
                     </label>
                     <input
+                      id="approvedByInput"
                       type="text"
+                      value={approvedBy}
+                      onChange={(e) => setApprovedBy(e.target.value)}
                       className="text-sm py-1 mt-1 h-8 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="statusSelect" className="block text-sm font-medium text-gray-700">
                       Status
                     </label>
-                    <select className="text-sm py-1 mt-1 h-8 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                      <option>Select</option>
+                    <select
+                      id="statusSelect"
+                      value={selectedStatus ?? ''}
+                      onChange={(e) => setSelectedStatus(e.target.value ? parseInt(e.target.value, 10) : null)}
+                      className="text-sm py-1 mt-1 h-8 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    >
+                      <option value="">Select</option>
                       {statusOptions.map((status) => (
                         <option key={status.id} value={status.id}>
                           {status.label}
@@ -245,11 +345,17 @@ const LandingPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="preparedBySelect" className="block text-sm font-medium text-gray-700">
                       Prepared by
                     </label>
-                    <select className="text-sm py-1 mt-1 h-8 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                      <option>Select</option>
+                    <select
+                      id="preparedBySelect"
+                      value={selectedPreparedBy ?? ''}
+                      onChange={(e) => setSelectedPreparedBy(e.target.value ? parseInt(e.target.value, 10) : null)}
+                      className="text-sm py-1 mt-1 h-8 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      required
+                    >
+                      <option value="">Select</option>
                       {preparedByOptions.map((user) => (
                         <option key={user.id} value={user.id}>
                           {user.label}
@@ -260,11 +366,14 @@ const LandingPage: React.FC = () => {
                 </div>
 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="descriptionTextarea" className="block text-sm font-medium text-gray-700">
                     Description
                   </label>
                   <textarea
+                    id="descriptionTextarea"
                     placeholder="Write a Description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     className="resize-none text-sm py-1 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 h-24"
                   ></textarea>
                 </div>
@@ -272,13 +381,13 @@ const LandingPage: React.FC = () => {
                 <div className="mt-6 flex justify-end">
                   <button
                     type="button"
+                    onClick={togglePopup}
                     className="mr-4 px-4 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg shadow"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    onClick={handleSave}
                     className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700"
                   >
                     Save
@@ -322,7 +431,6 @@ const LandingPage: React.FC = () => {
           </button>
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-auto">
           {viewType === "grid" ? (
             <div className="flex flex-wrap gap-6">

@@ -21,7 +21,7 @@ export class Estimation {
   @Column({ name: 'prepared_by'})
   preparedBy: number;
 
-  @Column({ name: 'version_no', nullable: true })
+  @Column({ name: 'version_no', type: 'varchar', nullable: true })
   versionNo?: string;
 
   @Column({ name: 'created_at', type: 'datetime', nullable: true })

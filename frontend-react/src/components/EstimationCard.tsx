@@ -1,26 +1,39 @@
 import React from "react";
+import { FaClock, FaUser } from "react-icons/fa";
 
 interface EstimationCardProps {
   projectName: string;
-  projectType: string;
   managerName: string;
+  projectType: string;
+  logo: string;
+  onClick?: () => void;
 }
 
-const EstimationCard: React.FC<EstimationCardProps> = ({ projectName, projectType, managerName }) => {
+const EstimationCard: React.FC<EstimationCardProps> = ({
+  projectName,
+  managerName,
+  projectType,
+  logo,
+  onClick,
+}) => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow hover:shadow-md transition">
-      <div className="mb-4">
-        <img src="/placeholder.png" alt="Project Logo" className="h-20 mx-auto" />
+    <div
+      className="bg-white rounded-2xl shadow hover:shadow-lg transition duration-300 cursor-pointer w-64 flex-shrink-0"
+      onClick={onClick}
+    >
+  
+      <div className="relative bg-gray-50 h-28 rounded-t-2xl flex items-center justify-center overflow-hidden">
+        <img src={logo} alt={projectName} className="max-h-full max-w-full object-contain" />
+        <FaClock className="absolute top-2 right-2 text-gray-400 text-sm" />
       </div>
-      <div className="flex items-center justify-between">
-      <h3 className="text-lg font-bold text-blue-700">{projectName}</h3>
-      <button className="bg-transparent border-none outline-none focus:outline-none">
-        <img src="./src/assets/history.svg" alt="history" className="w-5 h-5" />
-      </button>
-      </div>
-      <p className="text-sm text-gray-500">{projectType}</p>
-      <div className="mt-4 text-xs text-gray-500">
-        <p>👤 {managerName}</p>
+
+      <div className="p-4 space-y-1">
+        <h2 className="text-lg font-semibold text-blue-700">{projectName}</h2>
+        <p className="text-sm font-medium text-blue-700">{projectType}</p>
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <FaUser className="text-gray-500" />
+          <span>{managerName}</span>
+        </div>
       </div>
     </div>
   );

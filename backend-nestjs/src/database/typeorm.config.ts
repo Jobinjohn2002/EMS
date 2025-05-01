@@ -7,8 +7,9 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   host: 'localhost',
   port: 3306,
   username: 'root',
-  password: 'Excel@123',
+  password: 'excel.123',
   database: 'project_estimation',
   entities: [User, Estimation],
+  //logging: true,
   synchronize: true, // use migrations in prod!
 };

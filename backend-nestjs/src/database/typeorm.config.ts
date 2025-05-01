@@ -10,5 +10,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   password: 'excel.123',
   database: 'project_estimation',
   entities: [User, Estimation],
+  //logging: true,
   synchronize: true, // use migrations in prod!
 };

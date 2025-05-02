@@ -442,7 +442,7 @@ const LandingPage: React.FC = () => {
                   projectType={p.projectType}
                   logo={p.logo}
                   onClick={() =>
-                    navigate(`/project/${p.projectName.toLowerCase()}`)
+                    navigate(`/project/${p.projectName}`)
                   }
                 />
               ))}

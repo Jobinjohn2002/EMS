@@ -1,12 +1,13 @@
 import { useState } from "react";
 import API from "../services/api";
 import loginImage from '../assets/login.png';
+import { useNavigate } from "react-router-dom";
 
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const navigate = useNavigate();
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -18,7 +19,7 @@ export default function LoginForm() {
       );
 
       localStorage.setItem('token', response.data.access_token);
-      window.location.href = '/';
+      navigate("/landing");
     } catch (error) {
       console.error('Login failed:', error);
     }

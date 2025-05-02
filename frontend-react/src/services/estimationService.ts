@@ -1,12 +1,8 @@
-import { EstimationModel } from '../models/EstimationModal';
+import { Estimation } from '../models/Estimation';
+import { EstimationModel } from '../models/EstimationModel';
 import API from './api';
 
 export const estimationService = {
-//   getAll: () => API.get('/estimation'),
-//   getById: (id: number) => API.get(`/estimation/${id}`),
-//   create: (payload: any) => API.post('/estimation', payload),
-//   update: (id: number, payload: any) => API.put(`/estimation/${id}`, payload),
-//   delete: (id: number) => API.delete(`/estimation/${id}`),
 
 getAll: async (): Promise<EstimationModel[]> => {
     const response = await API.get('/estimation');
@@ -19,6 +15,10 @@ getAll: async (): Promise<EstimationModel[]> => {
   },
   
   create: async (estimation: Omit<EstimationModel, 'id'>): Promise<EstimationModel> => {
+    const response = await API.post('/estimation', estimation);
+    return response.data;
+  },
+  createEstimation: async (estimation: Omit<Estimation, 'id'>): Promise<Estimation> => {
     const response = await API.post('/estimation', estimation);
     return response.data;
   },

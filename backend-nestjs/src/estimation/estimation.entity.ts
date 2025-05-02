@@ -6,6 +6,9 @@ export class Estimation {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ name: 'project_id', nullable: true })
+  projectId?: number;
+  
   @Column({ type: 'date', nullable: true })
   date?: Date;
 

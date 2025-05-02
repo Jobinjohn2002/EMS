@@ -3,19 +3,24 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import RequirementsPage from "./pages/RequirementsPage";
 import ProjectDetailsPage from "./pages/ProjectDetailsPage";
+import VersionPage from "./pages/VersionPage";
+import LoginPage from "./pages/LoginPage";
+
 
 function App() {
   return (
     <Router>
       <Routes>
+      <Route path="/" element={<LoginPage />} />
         {/* Home/Landing */}
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/landing" element={<LandingPage />} />
 
         {/* Static Requirements Page */}
         <Route path="/requirements" element={<RequirementsPage />} />
 
         {/* Project Details Page */}
         <Route path="/project/:projectId" element={<ProjectDetailsPage />} />
+        <Route path="/version-history" element={<VersionPage />} />
       </Routes>
     </Router>
   );

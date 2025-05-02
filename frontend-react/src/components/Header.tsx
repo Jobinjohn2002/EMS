@@ -4,7 +4,7 @@ const Header = () => {
   return (
     <header className="w-full bg-gray-100 shadow-sm px-6 py-3 flex justify-between items-center">
       <div className="flex items-center gap-2">
-        <img src="./src/assets/excelencia.svg" alt="Excelencia Logo" className="h-8" />
+        <img src="../src/assets/excelencia.svg" alt="Excelencia Logo" className="h-8" />
       </div>
 
       <div className="mt-6">

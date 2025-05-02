@@ -1,5 +1,6 @@
 import React from "react";
 import { FaClock, FaUser } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 interface EstimationCardProps {
   projectName: string;
@@ -16,6 +17,13 @@ const EstimationCard: React.FC<EstimationCardProps> = ({
   logo,
   onClick,
 }) => {
+
+  const navigate = useNavigate();
+
+  const handleHistoryClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // prevent triggering the whole card click
+    navigate(`/version-history`);
+  };
   return (
     <div
       className="bg-white rounded-2xl shadow hover:shadow-lg transition duration-300 cursor-pointer w-64 flex-shrink-0"
@@ -30,7 +38,9 @@ const EstimationCard: React.FC<EstimationCardProps> = ({
       <div className="p-4 space-y-1">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-blue-700">{projectName}</h3>
-          <button className="bg-transparent p-0 border-none outline-none focus:outline-none">
+          <button 
+          onClick={handleHistoryClick}
+          className="bg-transparent p-0 border-none outline-none focus:outline-none">
             <img src="./src/assets/history.svg" alt="history" className="w-5 h-5" />
           </button>
         </div>

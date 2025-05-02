@@ -24,7 +24,6 @@ const EstimationTable: React.FC<EstimationTableProps> = ({ projects, refreshProj
 
   return (
     <div className="bg-white rounded-lg shadow overflow-x-auto p-4">
-      <Header />
       <h2 className="text-lg font-semibold mb-4">Version History</h2>
 
       <div className="overflow-x-auto">

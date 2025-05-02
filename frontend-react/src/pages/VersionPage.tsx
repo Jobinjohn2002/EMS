@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import EstimationTable from "../components/EstimationTable";
 import { estimationService } from "../services/estimationService";
 import { EstimationModel } from "../models/EstimationModel";
+import Header from "../components/Header";
 
 const VersionPage = () => {
   const [projects, setProjects] = useState<EstimationModel[]>([]);
@@ -18,6 +19,7 @@ const VersionPage = () => {
 
   return (
     <div className="p-4">
+      <Header />
       <EstimationTable projects={projects} refreshProjects={refreshProjects} />
     </div>
   );

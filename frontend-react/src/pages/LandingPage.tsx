@@ -10,7 +10,7 @@ import csLogo from "../assets/cs.png";
 import sanLogo from "../assets/san.png";
 import kbLogo from "../assets/kb.png";
 import 'primeicons/primeicons.css';
-import Header from "../components/Header";
+import Header,{LandingHeader} from "../components/Header";
 
 const mockData = [
   { id: 1, projectName: "Similrz",     clientName: "Fabien",  managerName: "Gidhin Shaji",       projectType: "Internal", logo: simLogo },
@@ -54,8 +54,8 @@ const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Header />
+    <div className="min-h-screen bg-white-100">
+      <LandingHeader />
       <div className="p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-semibold">Projects - Estimation</h2>
@@ -186,7 +186,7 @@ const LandingPage: React.FC = () => {
                   managerName={p.managerName}
                   projectType={p.projectType}
                   logo={p.logo}
-                  onClick={() => navigate(`/project/${p.projectName.toLowerCase()}`)}
+                  onClick={() => navigate(`/project/${p.projectName}`)}
                 />
               ))}
             </div>

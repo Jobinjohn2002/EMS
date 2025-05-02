@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import Header from "../components/Header";
 
 const tabs = [
-  "Requirements & Assumptions",
-  "Estimation",
-  "Summary",
-  "Billing Milestones",
+  "Requirement",
+  "Clarification",
+  "Assumption",
+  "Out of Scope",
 ];
 
 const ProjectDetailsPage: React.FC = () => {
@@ -14,13 +15,14 @@ const ProjectDetailsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen p-6 bg-gray-100">
+      <Header />
       <div className="bg-white rounded-xl shadow p-6">
         <h1 className="text-2xl font-bold mb-6 text-gray-800">
           {projectId} - Project Overview
         </h1>
 
         {/* Tabs */}
-        <div className="flex justify-end border-b mb-6">
+        <div className="flex border-b mb-6">
           {tabs.map((tab) => (
             <button
               key={tab}
@@ -38,22 +40,22 @@ const ProjectDetailsPage: React.FC = () => {
 
         {/* Tab Content */}
         <div>
-          {activeTab === "Requirements & Assumptions" && (
+          {activeTab === "Requirement" && (
             <div>
-              {/* Add content for Requirements & Assumptions */}
+              
             </div>
           )}
-          {activeTab === "Estimation" && (
+          {activeTab === "Clarification" && (
             <div>
               {/* Add content for Estimation */}
             </div>
           )}
-          {activeTab === "Summary" && (
+          {activeTab === "Assumption" && (
             <div>
               {/* Add content for Summary */}
             </div>
           )}
-          {activeTab === "Billing Milestones" && (
+          {activeTab === "Out of Scope" && (
             <div>
               {/* Add content for Billing Milestones */}
             </div>

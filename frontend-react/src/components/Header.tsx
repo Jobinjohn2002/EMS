@@ -2,7 +2,7 @@ import React from "react";
 
 const Header = () => {
   return (
-    <header className="w-full bg-white shadow-sm px-6 py-3 flex justify-between items-center">
+    <header className="w-full bg-gray-100 shadow-sm px-6 py-3 flex justify-between items-center">
       <div className="flex items-center gap-2">
         <img src="./src/assets/excelencia.svg" alt="Excelencia Logo" className="h-8" />
       </div>
@@ -31,4 +31,24 @@ const Header = () => {
   );
 };
 
+const LandingHeader = () => {
+  return (
+    <header className="w-full bg-gray-100 shadow-sm px-6 py-3 flex justify-between items-center">
+      <div className="flex items-center gap-2">
+        <img src="./src/assets/excelencia.svg" alt="Excelencia Logo" className="h-8" />
+      </div>
+
+      <div className="mt-6">
+        <div className="flex space-x-4 mb-4">
+          <div className="w-10 h-10 rounded-full bg-blue-200 flex justify-center items-center text-blue-700 font-bold">
+          P
+        </div>
+        </div>
+      </div>
+
+    </header>
+  );
+};
+
 export default Header;
+export {LandingHeader};

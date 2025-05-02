@@ -10,5 +10,5 @@ export interface EstimationModel {
   description?: string;
   approvedBy?: string;
   preparedBy?: string;
-  versionNo?: string;
+  versionNo?: number;
 }

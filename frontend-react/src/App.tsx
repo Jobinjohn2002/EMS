@@ -2,7 +2,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import RequirementsPage from "./pages/RequirementsPage";
-import ProjectDetailsPage from "./pages/ProjectDetailsPage";
+import ReqassumptionPage from "./pages/ReqassumptionPage";
 import VersionPage from "./pages/VersionPage";
 import LoginPage from "./pages/LoginPage";
 
@@ -19,7 +19,7 @@ function App() {
         <Route path="/requirements" element={<RequirementsPage />} />
 
         {/* Project Details Page */}
-        <Route path="/project/:projectId" element={<ProjectDetailsPage />} />
+        <Route path="/project/:projectId" element={<ReqassumptionPage />} />
         <Route path="/version-history" element={<VersionPage />} />
       </Routes>
     </Router>

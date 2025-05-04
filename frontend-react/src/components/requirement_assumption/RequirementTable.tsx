@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { MilestoneModal } from "./MilestoneModal"; // Assuming MilestoneModal is correctly implemented
+import requirementService from "../../services/requirementService";
 
 interface SubRequirement {
   id: number;
@@ -25,6 +26,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
 
   useEffect(() => {
     // Keep static data for now as fetching is commented out
+    fetchRequirements();
     const testData: Requirement[] = [
       {
         id: 1,
@@ -60,20 +62,21 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
         ],
       },
     ];
-    setRequirements(testData);
+    //setRequirements(testData);
   }, []);
 
   // The fetchRequirements and axios calls are kept but commented out
   // Uncomment and implement if you need to connect to an API
 
-  // const fetchRequirements = async () => {
-  //   try {
-  //     const res = await axios.get(`/api/requirement/${projectId}`);
-  //     setRequirements(res.data);
-  //   } catch (err) {
-  //     console.error("Failed to fetch requirements:", err);
-  //   }
-  // };
+  const fetchRequirements = async () => {
+    try {
+    //   const res = await axios.get(`/api/requirement/${projectId}`);
+      const res = await requirementService.getAllWithSubRequirements(); // Adjusted to use the service
+      setRequirements(res);
+    } catch (err) {
+      console.error("Failed to fetch requirements:", err);
+    }
+  };
 
   // const handleSave = async (requirement: string) => {
   //   try { /* ... axios.post call ... */

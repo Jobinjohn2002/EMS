@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { MilestoneModal } from "./MilestoneModal"; // Assuming MilestoneModal is correctly implemented
+import { EditMilestoneModal, MilestoneModal } from "./MilestoneModal"; // Assuming MilestoneModal is correctly implemented
 import requirementService from "../../services/requirementService";
 
 interface SubRequirement {
@@ -18,6 +18,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
   const [requirements, setRequirements] = useState<Requirement[]>([]);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [newSubRequirementText, setNewSubRequirementText] = useState<{ [key: number]: string }>({});
   // Optional: state to track which requirement/sub-requirement is being edited
   // const [editingRequirementId, setEditingRequirementId] = useState<number | null>(null);
@@ -159,11 +160,11 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
   };
 
     // Placeholder Edit Handlers (functionality needs implementation)
-    const handleEditRequirement = (requirementId: number) => {
-        console.log("Edit requirement clicked:", requirementId);
-        // Implement your edit logic here - e.g., show an input to edit the requirement text
-        alert(`Implement Edit functionality for Requirement ID: ${requirementId}`);
-    };
+    // const handleEditRequirement = (requirementId: number) => {
+    //     console.log("Edit requirement clicked:", requirementId);
+    //     // Implement your edit logic here - e.g., show an input to edit the requirement text
+    //     alert(`Implement Edit functionality for Requirement ID: ${requirementId}`);
+    // };
 
      const handleEditSubRequirement = (requirementId: number, subRequirementId: number) => {
         console.log(`Edit sub-requirement clicked: ${subRequirementId} in requirement ${requirementId}`);
@@ -196,6 +197,14 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
         title="Add Requirement" // Title can be adjusted if needed
         placeholder="Enter requirement"
         onClose={() => setShowModal(false)}
+        onSave={handleSave}
+      />
+
+      <EditMilestoneModal
+        isOpen={showEditModal}
+        title="Edit Requirement" // Title can be adjusted if needed
+        placeholder="Enter requirement"
+        onClose={() => setShowEditModal(false)}
         onSave={handleSave}
       />
 
@@ -238,7 +247,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
                      </button>
                      {/* EDIT ICON - Added */}
                     <button
-                        onClick={() => handleEditRequirement(req.id)}
+                        onClick={() => setShowEditModal(true)}
                         className="text-blue-500 hover:text-blue-700 focus:outline-none text-lg"
                         title="Edit Requirement"
                     >

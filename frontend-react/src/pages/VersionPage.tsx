@@ -1,6 +1,6 @@
 // src/pages/VersionPage.tsx
 import { useEffect, useState } from "react";
-import EstimationTable from "../components/EstimationTable";
+import EstimationTable from "../components/estimation/EstimationTable";
 import { estimationService } from "../services/estimationService";
 import { EstimationModel } from "../models/EstimationModel";
 import Header from "../components/Header";

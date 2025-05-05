@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
+import RequirementTable from "../components/requirement_assumption/RequirementTable";
+import ClarificationTable from "../components/requirement_assumption/ClarificationTable";
+// import AssumptionTable from "../components/assumption/AssumptionTable";
+// import OutOfScopeTable from "../components/outofscope/OutOfScopeTable";
 
-const tabs = [
-  "Requirement",
-  "Clarification",
-  "Assumption",
-  "Out of Scope",
-];
+const tabs = ["Requirement", "Clarification", "Assumption", "Out of Scope"];
 
-const ProjectDetailsPage: React.FC = () => {
+const ReqassumptionPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
@@ -41,32 +40,21 @@ const ProjectDetailsPage: React.FC = () => {
         {/* Tab Content */}
         <div>
           {activeTab === "Requirement" && (
-            <div>
-              
-            </div>
+            <RequirementTable projectId={projectId!} />
           )}
           {activeTab === "Clarification" && (
-            <div>
-              {/* Add content for Estimation */}
-            </div>
+            <ClarificationTable projectId={projectId!} />
           )}
-          {activeTab === "Assumption" && (
-            <div>
-              {/* Add content for Summary */}
-            </div>
+          {/* {activeTab === "Assumption" && (
+            <AssumptionTable projectId={projectId!} />
           )}
           {activeTab === "Out of Scope" && (
-            <div>
-              {/* Add content for Billing Milestones */}
-            </div>
-          )}
+            <OutOfScopeTable projectId={projectId!} />
+          )} */}
         </div>
       </div>
     </div>
   );
 };
 
-export default ProjectDetailsPage;
-
-
-
+export default ReqassumptionPage;

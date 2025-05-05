@@ -1,9 +1,9 @@
 // src/components/EstimationTable.tsx
 import React, { useState } from "react";
-import { EstimationModel } from "../models/EstimationModel";
+import { EstimationModel } from "../../models/EstimationModel";
 import EstimationModal from "./EstimationModal";
-import { estimationService } from "../services/estimationService";
-import Header from "./Header";
+import { estimationService } from "../../services/estimationService";
+import Header from "../Header";
 
 interface EstimationTableProps {
   projects: EstimationModel[];

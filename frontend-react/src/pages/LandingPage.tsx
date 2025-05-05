@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import EstimationCard from "../components/EstimationCard";
+import EstimationCard from "../components/estimation/EstimationCard";
 import { estimationService } from "../services/estimationService";
 import { EstimationModel } from "../models/EstimationModel"; 
 import simLogo from "../assets/sim.png";

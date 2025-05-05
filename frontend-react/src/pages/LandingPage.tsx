@@ -19,6 +19,7 @@ type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 // Import your frontend Estimation model
 import { Estimation as FrontendEstimation } from '../models/Estimation';
+import EstimationTable from "../components/estimation/EstimationTable";
 
 // Define the type for the data payload expected by the backend create endpoint
 // This is based on your frontend model, omitting backend-managed fields
@@ -183,6 +184,11 @@ const LandingPage: React.FC = () => {
       console.error("Failed to fetch project estimations", error);
     }
   };
+
+  const handleEdit = (projectId: number) => {
+    navigate(`/create-estimation/${projectId}`);
+  };
+
   useEffect(() => {
     fetchProjects();
     projectService
@@ -455,63 +461,11 @@ const LandingPage: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 text-sm">
-                <thead className="bg-blue-50">
-                  <tr>
-                    <th className="px-4 py-2 text-left font-medium text-gray-700 uppercase tracking-wide">
-                      Project Name
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-700 uppercase tracking-wide">
-                      Client Name
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-700 uppercase tracking-wide">
-                      Manager Name
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-700 uppercase tracking-wide">
-                      Project Type
-                    </th>
-                    <th className="px-4 py-2 text-center font-medium text-gray-700 uppercase tracking-wide">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {mockData.map((p) => (
-                    <tr key={p.id} className="hover:bg-gray-50 transition">
-                      <td className="px-4 py-2 whitespace-nowrap text-gray-800 font-medium">
-                        {p.projectName}
-                      </td>
-                      <td className="px-4 py-2 whitespace-nowrap text-gray-600">
-                        {p.clientName}
-                      </td>
-                      <td className="px-4 py-2 whitespace-nowrap text-gray-600">
-                        {p.managerName}
-                      </td>
-                      <td className="px-4 py-2 whitespace-nowrap text-gray-600">
-                        {p.projectType}
-                      </td>
-                      <td className="px-4 py-2 whitespace-nowrap text-center flex justify-center space-x-3">
-                        <button
-                          onClick={() => navigate(`/create-estimation/${p.id}`)}
-                          aria-label="Edit"
-                          className="hover:text-blue-600 transition"
-                        >
-                          <i className="pi pi-pencil text-sm"></i>
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p.id)}
-                          aria-label="Delete"
-                          className="hover:text-red-600 transition"
-                        >
-                          <i className="pi pi-trash text-sm"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <EstimationTable
+              projects={projects}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           )}
         </div>
       </div>

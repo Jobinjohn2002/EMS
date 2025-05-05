@@ -1,13 +1,14 @@
 // estimation.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Project } from 'src/project/project.entity';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Estimation {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'project_id', nullable: true })
-  projectId?: number;
+  @Column({ name: 'project_id', type: 'int' })
+  projectId: number;
   
   @Column({ type: 'date', nullable: true })
   date?: Date;
@@ -35,4 +36,8 @@ export class Estimation {
 
   @Column({ name: 'modified_by', nullable: true })
   modifiedBy?: number;
+
+  @ManyToOne(() => Project, (p) => p.estimations)
+  @JoinColumn({ name: 'project_id' })
+  project?: Project;
 }

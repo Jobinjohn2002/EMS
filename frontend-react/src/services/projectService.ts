@@ -7,6 +7,10 @@ getAll: async (): Promise<ProjectModel[]> => {
     const response = await API.get('/project/dropdown');
     return response.data;
   },
+  getProjectEstimations: async ()=> {
+    const response = await API.get('/project/projects-estimations');
+    return response.data;
+  },
   
   getById: async (id: number): Promise<ProjectModel> => {
     const response = await API.get(`/project/${id}`);

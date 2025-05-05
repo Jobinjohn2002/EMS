@@ -1,4 +1,4 @@
-// src/components/EstimationTable.tsx
+// src/components/VersionTable.tsx
 import React, { useState } from "react";
 import { EstimationModel } from "../../models/EstimationModel";
 import EstimationModal from "./EstimationModal";
@@ -10,7 +10,7 @@ interface EstimationTableProps {
   refreshProjects: () => Promise<void>;
 }
 
-const EstimationTable: React.FC<EstimationTableProps> = ({ projects, refreshProjects }) => {
+const VersionTable: React.FC<EstimationTableProps> = ({ projects, refreshProjects }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleDelete = async (id: number) => {
@@ -119,4 +119,4 @@ const EstimationTable: React.FC<EstimationTableProps> = ({ projects, refreshProj
   );
 };
 
-export default EstimationTable;
+export default VersionTable;

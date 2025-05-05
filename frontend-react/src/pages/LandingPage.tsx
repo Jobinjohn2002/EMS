@@ -102,7 +102,6 @@ const LandingPage: React.FC = () => {
   const [selectedPreparedBy, setSelectedPreparedBy] = useState<number | null>(null);
   const [description, setDescription] = useState<string>('');
 
-
   const [dropdownProjects, setDropdownProjects] = useState<ProjectOption[]>([]);
   const statusOptions: StatusOption[] = [
     { id: 1, label: "Pending" },
@@ -176,8 +175,16 @@ const LandingPage: React.FC = () => {
       alert(`Failed to save estimation. Please try again.\nError: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
-
+  const fetchProjects = async () => {
+    try {
+      const data = await projectService.getProjectEstimations();
+      setProjects(data);
+    } catch (error) {
+      console.error("Failed to fetch project estimations", error);
+    }
+  };
   useEffect(() => {
+    fetchProjects();
     projectService
       .getAll()
       .then((data) => {

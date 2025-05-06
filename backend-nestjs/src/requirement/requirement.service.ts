@@ -43,7 +43,9 @@ export class RequirementService {
   }
 
   findAll() {
-    return this.requirementRepository.find();
+    return this.requirementRepository.find({
+      where: { status: true },
+    });
   }
 
   async findAllWithSubRequirements() {
@@ -114,7 +116,23 @@ export class RequirementService {
     return this.findOne(id);
   }
 
-  delete(id: number) {
-    return this.requirementRepository.delete(id);
+  async delete(id: number) {
+    // Generate next modifiedBy (for audit)
+    const lastModifiedBy = await this.requirementRepository
+      .createQueryBuilder('r')
+      .orderBy('r.modifiedBy', 'DESC')
+      .getOne();
+  
+    const nextModifiedBy = typeof lastModifiedBy?.modifiedBy === 'number'
+      ? lastModifiedBy.modifiedBy + 1
+      : 101;
+  
+    await this.requirementRepository.update(id, {
+      status: false,
+      modifiedBy: nextModifiedBy,
+    });
+  
+    return this.findOne(id);
   }
+  
 }

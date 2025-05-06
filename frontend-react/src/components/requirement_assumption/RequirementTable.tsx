@@ -9,6 +9,7 @@ interface SubRequirement {
 }
 
 interface Requirement {
+  status: any;
   id: number;
   requirement: string;
   sub_requirements: SubRequirement[];
@@ -37,6 +38,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
           { id: 101, sub_requirement: "Login via email/password" },
           { id: 102, sub_requirement: "Forgot password functionality" },
         ],
+        status: false
       },
       {
         id: 2,
@@ -45,6 +47,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
           { id: 201, sub_requirement: "Show user stats" },
           { id: 202, sub_requirement: "Display recent activities" },
         ],
+        status: false
       },
       {
         id: 3,
@@ -54,6 +57,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
           { id: 302, sub_requirement: "Implement real-time filtering of subcategories based on selection" },
           { id: 303, sub_requirement: "Provide CRUD endpoints for admins to manage categories/subcategories" },
         ],
+        status: false
       },
       {
         id: 4,
@@ -62,6 +66,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
           { id: 401, sub_requirement: "Generate unique QR codes for each ticket, encoded with ticket_id and user details." },
           { id: 402, sub_requirement: "Allow users to download their ticket (PDF/Image) with the QR code after purchase." },
         ],
+        status: false
       },
     ];
     //setRequirements(testData);
@@ -118,8 +123,6 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
     }
   };
 
-
-
   // This function is triggered by Enter key or Save icon click on the inline input
   const handleAddSub = async (requirementId: number, text: string) => {
     if (!text.trim()) return;
@@ -149,11 +152,17 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
     setNewSubRequirementText((prev) => ({ ...prev, [requirementId]: value }));
   };
 
-  const handleDeleteRequirement = (requirementId: number) => {
-    console.log("Delete requirement (static data):", requirementId);
-    // For static data: Remove the requirement
-    setRequirements(requirements.filter((req) => req.id !== requirementId));
+  const handleDeleteRequirement = async (requirementId: number) => {
+    try {
+      await requirementService.update(requirementId, { status: false }); // Soft delete by setting status
+      setRequirements(requirements.map(req =>
+        req.id === requirementId ? { ...req, status: false } : req
+      ));
+    } catch (error) {
+      console.error("Failed to soft delete requirement:", error);
+    }
   };
+  
 
   const handleDeleteSubRequirement = (requirementId: number, subRequirementId: number) => {
     console.log(`Delete sub-requirement (static data) ${subRequirementId} from requirement ${requirementId}`);
@@ -253,7 +262,9 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {requirements.map((req) => (
+          {requirements
+          .filter(req => req.status === true || req.status === 1)
+          .map((req) => (
               <React.Fragment key={req.id}>
                 {/* Main Requirement Row */}
                 <tr className="hover:bg-gray-100"> {/* Hover effect */}

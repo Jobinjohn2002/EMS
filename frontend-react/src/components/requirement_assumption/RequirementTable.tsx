@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { EditMilestoneModal, MilestoneModal } from "./MilestoneModal"; // Assuming MilestoneModal is correctly implemented
 import requirementService from "../../services/requirementService";
 
@@ -15,21 +14,18 @@ interface Requirement {
   sub_requirements: SubRequirement[];
 }
 
-const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
+
+const RequirementTable: React.FC<{ projectId: string }> = ({ }) => {
   const [requirements, setRequirements] = useState<Requirement[]>([]);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingRequirement, setEditingRequirement] = useState<Requirement | null>(null);
   const [newSubRequirementText, setNewSubRequirementText] = useState<{ [key: number]: string }>({});
-  // Optional: state to track which requirement/sub-requirement is being edited
-  // const [editingRequirementId, setEditingRequirementId] = useState<number | null>(null);
-  // const [editingSubRequirementId, setEditingSubRequirementId] = useState<number | null>(null);
-
 
   useEffect(() => {
-    // Keep static data for now as fetching is commented out
     fetchRequirements();
+<<<<<<< HEAD
     const testData: Requirement[] = [
       {
         id: 1,
@@ -70,52 +66,35 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
       },
     ];
     //setRequirements(testData);
+=======
+>>>>>>> cb14b2a99f73f24de77ea5535e931ea77c5d1dbe
   }, []);
-
-  // The fetchRequirements and axios calls are kept but commented out
-  // Uncomment and implement if you need to connect to an API
 
   const fetchRequirements = async () => {
     try {
-      //   const res = await axios.get(`/api/requirement/${projectId}`);
-      const res = await requirementService.getAllWithSubRequirements(); // Adjusted to use the service
+      const res = await requirementService.getAllWithSubRequirements();
       setRequirements(res);
     } catch (err) {
       console.error("Failed to fetch requirements:", err);
     }
   };
 
-  // const handleSave = async (requirement: string) => {
-  //   try { /* ... axios.post call ... */
-  //      setShowModal(false);
-  //     // fetchRequirements();
-  //   } catch (err) { console.error("Failed to add requirement:", err); }
-  // };
-
-  // This function is triggered by Enter key or Save icon click on the inline input
-  // const handleAddSub = async (requirementId: number, text: string) => {
-  //   if (!text.trim()) return;
-  //   try { /* ... axios.post call ... */
-  //     // fetchRequirements();
-  //     setNewSubRequirementText((prev) => ({ ...prev, [requirementId]: "" })); // Clear input after successful save
-  //   } catch (err) { console.error("Failed to add sub-requirement:", err); }
-  // };
-
   const handleSave = async (requirementText: string) => {
     try {
       const estimationId = 1;
       const createdBy = 101;
+      const newRequirement = await requirementService.create(
+        {
+          estimationId,
+          requirement: requirementText,
+          status: true,
+          createdBy,
+          createdAt: "",
+        },
+        [] // Provide an empty array for sub-requirements
+      );
 
-      const newRequirement = await requirementService.create({
-        estimationId,
-        requirement: requirementText,
-        status: true,
-        createdBy,
-        createdAt: ""
-      });
-
-      // Append to list and refresh UI
-      setRequirements(prev => [...prev, { ...newRequirement, sub_requirements: [] }]);
+      setRequirements((prev) => [...prev, { ...newRequirement, sub_requirements: [] }]);
     } catch (error) {
       console.error("Error saving requirement:", error);
     } finally {
@@ -123,28 +102,21 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
     }
   };
 
+<<<<<<< HEAD
   // This function is triggered by Enter key or Save icon click on the inline input
+=======
+>>>>>>> cb14b2a99f73f24de77ea5535e931ea77c5d1dbe
   const handleAddSub = async (requirementId: number, text: string) => {
     if (!text.trim()) return;
-    console.log(`Adding sub-requirement (static data) "${text}" to requirement ${requirementId}`);
-
-    // Use Math.random() for unique id with static data
-    const newSub = { id: Math.random(), sub_requirement: text };
-
-    setRequirements(
-      requirements.map((req) =>
+    const createdBy = 101;
+    const newSubRequirement = await requirementService.createSubRequirement(requirementId, text, createdBy);
+    setRequirements((prev) =>
+      prev.map((req) =>
         req.id === requirementId
-          ? {
-            ...req,
-            sub_requirements: [
-              ...req.sub_requirements,
-              newSub
-            ],
-          }
+          ? { ...req, sub_requirements: [...req.sub_requirements, {id: newSubRequirement.id, sub_requirement: newSubRequirement.subrequirement}] }
           : req
       )
     );
-    // Clear the input field after adding
     setNewSubRequirementText((prev) => ({ ...prev, [requirementId]: "" }));
   };
 
@@ -152,6 +124,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
     setNewSubRequirementText((prev) => ({ ...prev, [requirementId]: value }));
   };
 
+<<<<<<< HEAD
   const handleDeleteRequirement = async (requirementId: number) => {
     try {
       await requirementService.update(requirementId, { status: false }); // Soft delete by setting status
@@ -161,14 +134,16 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
     } catch (error) {
       console.error("Failed to soft delete requirement:", error);
     }
+=======
+  const handleDeleteRequirement = (requirementId: number) => {
+    setRequirements((prev) => prev.filter((req) => req.id !== requirementId));
+>>>>>>> cb14b2a99f73f24de77ea5535e931ea77c5d1dbe
   };
   
 
   const handleDeleteSubRequirement = (requirementId: number, subRequirementId: number) => {
-    console.log(`Delete sub-requirement (static data) ${subRequirementId} from requirement ${requirementId}`);
-    // For static data: Remove the sub-requirement
-    setRequirements(
-      requirements.map((req) =>
+    setRequirements((prev) =>
+      prev.map((req) =>
         req.id === requirementId
           ? {
             ...req,
@@ -179,12 +154,15 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
     );
   };
 
+  const handleCancelAddSub = (requirementId: number) => {
+    setNewSubRequirementText((prev) => ({ ...prev, [requirementId]: "" }));
+  };
   const handleEditSave = async (id: number, updatedText: string) => {
     try {
-      await requirementService.update(id, { requirement: updatedText }); // assuming update method exists
-      setRequirements(reqs =>
-        reqs.map(r => r.id === id ? { ...r, requirement: updatedText } : r)
-      );
+      // await requirementService.update(id, { requirement: updatedText }); // assuming update method exists
+      // setRequirements(reqs =>
+      //   reqs.map(r => r.id === id ? { ...r, requirement: updatedText } : r)
+      // );
     } catch (err) {
       console.error("Failed to update requirement:", err);
     } finally {
@@ -192,26 +170,6 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
       setEditingRequirement(null);
     }
   };
-
-
-  // Placeholder Edit Handlers (functionality needs implementation)
-  // const handleEditRequirement = (requirementId: number) => {
-  //     console.log("Edit requirement clicked:", requirementId);
-  //     // Implement your edit logic here - e.g., show an input to edit the requirement text
-  //     alert(`Implement Edit functionality for Requirement ID: ${requirementId}`);
-  // };
-
-  const handleEditSubRequirement = (requirementId: number, subRequirementId: number) => {
-    console.log(`Edit sub-requirement clicked: ${subRequirementId} in requirement ${requirementId}`);
-    // Implement your edit logic here - e.g., show an editable input for this sub-requirement
-    alert(`Implement Edit functionality for Sub-Requirement ID: ${subRequirementId}`);
-  };
-
-  // Handler for the Cancel (X) button on the inline input
-  const handleCancelAddSub = (requirementId: number) => {
-    setNewSubRequirementText(prev => ({ ...prev, [requirementId]: '' })); // Clear the input
-  };
-
   // --- End Placeholder/Static Data Logic ---
 
 
@@ -321,29 +279,29 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
                     {req.sub_requirements.map((sub) => (
                       <tr key={sub.id} className="bg-gray-50 hover:bg-gray-100"> {/* Light background for sub-rows */}
                         <td className="px-4 py-3 flex items-center space-x-2 w-12 pl-8"> {/* Indentation and icons */}
-                          {/* Bullet or arrow icon for sub-item visualization */}
-                          {/* Using a simple dot for now, you could use an arrow like the previous version if preferred */}
-                          <span className="text-gray-500 text-xs">•</span>
-                          {/* EDIT ICON - Added for sub-requirements */}
-                          <button
-                            onClick={() => handleEditSubRequirement(req.id, sub.id)}
-                            className="text-blue-500 hover:text-blue-700 focus:outline-none text-lg"
-                            title="Edit Sub-Requirement"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                          </button>
-                          {/* DELETE ICON - Ensured correct placement */}
-                          <button
-                            onClick={() => handleDeleteSubRequirement(req.id, sub.id)}
-                            className="text-red-500 hover:text-red-700 focus:outline-none text-lg"
-                            title="Delete Sub-Requirement"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
+                            {/* Bullet or arrow icon for sub-item visualization */}
+                            {/* Using a simple dot for now, you could use an arrow like the previous version if preferred */}
+                            <span className="text-gray-500 text-xs">•</span>
+                            {/* EDIT ICON - Added for sub-requirements */}
+                             <button
+                                onClick={() => handleDeleteSubRequirement(req.id, sub.id)}
+                                className="text-blue-500 hover:text-blue-700 focus:outline-none text-lg"
+                                title="Edit Sub-Requirement"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                            </button>
+                            {/* DELETE ICON - Ensured correct placement */}
+                             <button
+                               onClick={() => handleDeleteSubRequirement(req.id, sub.id)}
+                               className="text-red-500 hover:text-red-700 focus:outline-none text-lg"
+                               title="Delete Sub-Requirement"
+                             >
+                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                               </svg>
+                             </button>
                         </td>
                         {/* Added break-words */}
                         <td className="px-4 py-3 text-sm text-gray-600 break-words">{sub.sub_requirement}</td>

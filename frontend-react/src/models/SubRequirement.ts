@@ -1,7 +1,7 @@
 export interface SubRequirement {
     id: number;
     requirementId: number;
-    title: string;
+    subrequirement: string;
     description: string;
     status: boolean;
     createdBy: number;

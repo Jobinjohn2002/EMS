@@ -5,10 +5,7 @@ export class CreateSubRequirementDto {
   requirementId: number;
 
   @IsString()
-  title: string;
-
-  @IsString()
-  description: string;
+  subrequirement: string;
 
   @IsBoolean()
   status: boolean;

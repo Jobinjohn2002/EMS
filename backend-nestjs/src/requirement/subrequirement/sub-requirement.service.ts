@@ -2,32 +2,37 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SubRequirement } from './sub-requirement.entity';
+import { CreateSubRequirementDto } from './dto/create-sub-requirement.dto';
+import { UpdateSubRequirementDto } from './dto/update-sub-requirement.dto';
 
 @Injectable()
 export class SubRequirementService {
   constructor(
     @InjectRepository(SubRequirement)
-    private subRequirementRepo: Repository<SubRequirement>,
+    private readonly subRequirementRepo: Repository<SubRequirement>,
   ) {}
 
-  create(data: Partial<SubRequirement>) {
-    const sub = this.subRequirementRepo.create(data);
-    return this.subRequirementRepo.save(sub);
+  create(createDto: CreateSubRequirementDto) {
+    const subReq = this.subRequirementRepo.create(createDto);
+    return this.subRequirementRepo.save(subReq);
   }
 
   findAll() {
-    return this.subRequirementRepo.find();
+    return this.subRequirementRepo.find({ relations: ['requirement'] });
   }
 
   findOne(id: number) {
-    return this.subRequirementRepo.findOneBy({ id });
+    return this.subRequirementRepo.findOne({
+      where: { id },
+      relations: ['requirement'],
+    });
   }
 
-  update(id: number, data: Partial<SubRequirement>) {
-    return this.subRequirementRepo.update(id, data);
+  update(id: number, updateDto: UpdateSubRequirementDto) {
+    return this.subRequirementRepo.update(id, updateDto);
   }
 
-  delete(id: number) {
+  async delete(id: number) {
     return this.subRequirementRepo.delete(id);
   }
 }

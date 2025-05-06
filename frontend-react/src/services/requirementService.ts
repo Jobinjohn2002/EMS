@@ -18,14 +18,27 @@ export const requirementService = {
     return response.data;
   },
 
-  create: async (requirement: Omit<Requirement, 'id'>): Promise<Requirement> => {
+  create: async (
+    requirement: Omit<Requirement, 'id'>, 
+    subRequirements: Omit<SubRequirement, 'id' | 'requirement'>[] // SubRequirements to be created
+  ): Promise<Requirement> => {
     const { createdAt, modifiedAt, ...safeRequirement } = requirement;
-    const response = await API.post('/requirement', safeRequirement);
+    const response = await API.post('/requirement', {
+      ...safeRequirement,
+      subRequirements: subRequirements // Pass subRequirements data
+    });
     return response.data;
   },
 
-  update: async (id: number, requirement: Partial<Requirement>): Promise<Requirement> => {
-    const response = await API.put(`/requirement/${id}`, requirement);
+  update: async (
+    id: number, 
+    requirement: Partial<Requirement>, 
+    subRequirements: Omit<SubRequirement, 'id' | 'requirement'>[] // SubRequirements to be updated
+  ): Promise<Requirement> => {
+    const response = await API.put(`/requirement/${id}`, {
+      ...requirement,
+      subRequirements: subRequirements // Pass subRequirements data
+    });
     return response.data;
   },
 
@@ -45,10 +58,12 @@ export const requirementService = {
   },
 
   // Create sub-requirement
-  createSubRequirement: async (requirementId: number, text: string): Promise<SubRequirement> => {
+  createSubRequirement: async (requirementId: number, subrequirement: string, createdBy: number): Promise<SubRequirement> => {
     const response = await API.post('/sub-requirement', {
       requirementId, 
-      text
+      subrequirement,
+      status: true, // default value
+      createdBy,
     });
     return response.data;
   },

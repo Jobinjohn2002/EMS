@@ -42,9 +42,9 @@ const ReqassumptionPage: React.FC = () => {
           {activeTab === "Requirement" && (
             <RequirementTable projectId={projectId!} />
           )}
-          {activeTab === "Clarification" && (
+          {/* {activeTab === "Clarification" && (
             <ClarificationTable projectId={projectId!} />
-          )}
+          )} */}
           {/* {activeTab === "Assumption" && (
             <AssumptionTable projectId={projectId!} />
           )}

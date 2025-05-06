@@ -21,8 +21,8 @@ export class SubRequirement {
   @Column({ name: 'created_by' })
   createdBy: number;
 
-  @Column({ name: 'created_at', type: 'datetime' })
-  createdAt: Date;
+  @Column({ name: 'created_at', type: 'datetime', nullable: true })
+  createdAt?: Date;
 
   @Column({ name: 'modified_by', nullable: true })
   modifiedBy?: number;

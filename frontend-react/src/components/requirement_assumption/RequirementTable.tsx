@@ -19,6 +19,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ }) => {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [editingRequirement, setEditingRequirement] = useState<Requirement | null>(null);
   const [newSubRequirementText, setNewSubRequirementText] = useState<{ [key: number]: string }>({});
 
   useEffect(() => {
@@ -84,9 +85,9 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ }) => {
       prev.map((req) =>
         req.id === requirementId
           ? {
-              ...req,
-              sub_requirements: req.sub_requirements.filter((sub) => sub.id !== subRequirementId),
-            }
+            ...req,
+            sub_requirements: req.sub_requirements.filter((sub) => sub.id !== subRequirementId),
+          }
           : req
       )
     );
@@ -95,7 +96,19 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ }) => {
   const handleCancelAddSub = (requirementId: number) => {
     setNewSubRequirementText((prev) => ({ ...prev, [requirementId]: "" }));
   };
-
+  const handleEditSave = async (id: number, updatedText: string) => {
+    try {
+      // await requirementService.update(id, { requirement: updatedText }); // assuming update method exists
+      // setRequirements(reqs =>
+      //   reqs.map(r => r.id === id ? { ...r, requirement: updatedText } : r)
+      // );
+    } catch (err) {
+      console.error("Failed to update requirement:", err);
+    } finally {
+      setShowEditModal(false);
+      setEditingRequirement(null);
+    }
+  };
   // --- End Placeholder/Static Data Logic ---
 
 
@@ -119,13 +132,18 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ }) => {
         onSave={handleSave}
       />
 
-      <EditMilestoneModal
-        isOpen={showEditModal}
-        title="Edit Requirement" // Title can be adjusted if needed
-        placeholder="Enter requirement"
-        onClose={() => setShowEditModal(false)}
-        onSave={handleSave}
-      />
+      {editingRequirement && (
+        <EditMilestoneModal
+          isOpen={showEditModal}
+          title="Edit Requirement"
+          placeholder="Enter requirement"
+          defaultValue={editingRequirement.requirement}
+          onClose={() => setShowEditModal(false)}
+          onSave={(text) => handleEditSave(editingRequirement.id, text)}
+        />
+      )}
+
+
 
       {/* Table */}
       <div className="bg-white shadow rounded-xl overflow-hidden"> {/* Wrapper for rounded corners */}
@@ -147,44 +165,47 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ }) => {
                 <tr className="hover:bg-gray-100"> {/* Hover effect */}
                   <td className="px-4 py-3 flex items-center space-x-2"> {/* Centered icons */}
                     {/* Expand/Collapse Button */}
-                     <button
-                       onClick={() => setExpandedId(expandedId === req.id ? null : req.id)}
-                       className="text-gray-500 hover:text-gray-700 focus:outline-none text-lg" // Icon styling
-                        title={expandedId === req.id ? "Collapse" : "Expand"}
-                     >
-                       {expandedId === req.id ? (
-                         // Minus icon for collapsed
-                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                         </svg>
-                       ) : (
-                         // Plus icon for expanded
-                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                         </svg>
-                       )}
-                     </button>
-                     {/* EDIT ICON - Added */}
                     <button
-                        onClick={() => setShowEditModal(true)}
-                        className="text-blue-500 hover:text-blue-700 focus:outline-none text-lg"
-                        title="Edit Requirement"
+                      onClick={() => setExpandedId(expandedId === req.id ? null : req.id)}
+                      className="text-gray-500 hover:text-gray-700 focus:outline-none text-lg" // Icon styling
+                      title={expandedId === req.id ? "Collapse" : "Expand"}
                     >
+                      {expandedId === req.id ? (
+                        // Minus icon for collapsed
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                         </svg>
+                      ) : (
+                        // Plus icon for expanded
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                      )}
+                    </button>
+                    {/* EDIT ICON - Added */}
+                    <button
+                      onClick={() => {
+                        setEditingRequirement(req);
+                        setShowEditModal(true);
+                      }}
+                      className="text-blue-500 hover:text-blue-700 focus:outline-none text-lg"
+                      title="Edit Requirement"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
                     </button>
                     {/* DELETE ICON - Ensured correct placement */}
-                     <button
-                       onClick={() => handleDeleteRequirement(req.id)}
-                       className="text-red-500 hover:text-red-700 focus:outline-none text-lg"
-                       title="Delete Requirement"
-                     >
-                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                       </svg>
-                     </button>
-                   </td>
+                    <button
+                      onClick={() => handleDeleteRequirement(req.id)}
+                      className="text-red-500 hover:text-red-700 focus:outline-none text-lg"
+                      title="Delete Requirement"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </td>
                   {/* Added break-words to help prevent overflow collapsing column */}
                   <td className="px-4 py-3 font-medium text-gray-900 break-words">{req.requirement}</td>
                 </tr>
@@ -226,46 +247,46 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ }) => {
 
                     {/* Inline Sub-Requirement Add Input Row */}
                     <tr className="bg-gray-50 hover:bg-gray-100">
-                       <td className="px-4 py-3 w-12 pl-8"> {/* Indentation */}
-                          {/* Optional: Add a '+' icon or similar here if desired */}
-                       </td>
-                       <td className="px-4 py-3 flex items-center space-x-2"> {/* Use flex to align input and buttons */}
-                         <input
-                           type="text"
-                           className="border border-gray-300 px-3 py-1 rounded-md w-full text-sm text-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="Enter sub-requirement and press Enter"
-                           value={newSubRequirementText[req.id] || ''}
-                           onChange={(e) => handleInputChange(req.id, e.target.value)}
-                            // Trigger add on Enter key
-                           onKeyDown={(e) => {
-                             if (e.key === "Enter") {
-                               const value = (e.target as HTMLInputElement).value;
-                               handleAddSub(req.id, value);
-                             }
-                           }}
-                         />
-                         {/* SAVE (TICK) ICON - Added */}
+                      <td className="px-4 py-3 w-12 pl-8"> {/* Indentation */}
+                        {/* Optional: Add a '+' icon or similar here if desired */}
+                      </td>
+                      <td className="px-4 py-3 flex items-center space-x-2"> {/* Use flex to align input and buttons */}
+                        <input
+                          type="text"
+                          className="border border-gray-300 px-3 py-1 rounded-md w-full text-sm text-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Enter sub-requirement and press Enter"
+                          value={newSubRequirementText[req.id] || ''}
+                          onChange={(e) => handleInputChange(req.id, e.target.value)}
+                          // Trigger add on Enter key
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              const value = (e.target as HTMLInputElement).value;
+                              handleAddSub(req.id, value);
+                            }
+                          }}
+                        />
+                        {/* SAVE (TICK) ICON - Added */}
                         <button
-                            onClick={() => handleAddSub(req.id, newSubRequirementText[req.id] || '')}
-                            className="text-green-500 hover:text-green-700 focus:outline-none text-lg"
-                            title="Save Sub-Requirement"
-                            disabled={!newSubRequirementText[req.id]?.trim()} // Disable if input is empty
+                          onClick={() => handleAddSub(req.id, newSubRequirementText[req.id] || '')}
+                          className="text-green-500 hover:text-green-700 focus:outline-none text-lg"
+                          title="Save Sub-Requirement"
+                          disabled={!newSubRequirementText[req.id]?.trim()} // Disable if input is empty
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
                         </button>
                         {/* CANCEL (X) ICON - Added and wired up */}
-                         <button
-                            onClick={() => handleCancelAddSub(req.id)}
-                            className="text-gray-500 hover:text-gray-700 focus:outline-none text-lg"
-                            title="Cancel"
-                         >
-                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                             </svg>
+                        <button
+                          onClick={() => handleCancelAddSub(req.id)}
+                          className="text-gray-500 hover:text-gray-700 focus:outline-none text-lg"
+                          title="Cancel"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
                         </button>
-                       </td>
+                      </td>
                     </tr>
                   </>
                 )}

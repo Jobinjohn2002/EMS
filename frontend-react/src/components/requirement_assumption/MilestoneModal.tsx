@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface MilestoneModalProps {
   isOpen: boolean;
@@ -11,6 +11,7 @@ interface EditMilestoneModalProps {
   isOpen: boolean;
   title: string;
   placeholder: string;
+  defaultValue?: string;
   onClose: () => void;
   onSave: (value: string) => void;
 }
@@ -58,10 +59,16 @@ export const EditMilestoneModal: React.FC<EditMilestoneModalProps> = ({
   isOpen,
   title,
   placeholder,
+  defaultValue,
   onClose,
   onSave,
 }) => {
-  const [input, setInput] = useState("");
+
+  const [input, setInput] = useState(defaultValue || "");
+
+  useEffect(() => {
+    setInput(defaultValue || "");
+  }, [defaultValue]);
 
   if (!isOpen) return null;
 

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { EditMilestoneModal, MilestoneModal } from "./MilestoneModal"; // Assuming MilestoneModal is correctly implemented
 import requirementService from "../../services/requirementService";
 
@@ -14,133 +13,61 @@ interface Requirement {
   sub_requirements: SubRequirement[];
 }
 
-const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
+
+const RequirementTable: React.FC<{ projectId: string }> = ({ }) => {
   const [requirements, setRequirements] = useState<Requirement[]>([]);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [newSubRequirementText, setNewSubRequirementText] = useState<{ [key: number]: string }>({});
-  // Optional: state to track which requirement/sub-requirement is being edited
-  // const [editingRequirementId, setEditingRequirementId] = useState<number | null>(null);
-  // const [editingSubRequirementId, setEditingSubRequirementId] = useState<number | null>(null);
-
 
   useEffect(() => {
-    // Keep static data for now as fetching is commented out
     fetchRequirements();
-    const testData: Requirement[] = [
-      {
-        id: 1,
-        requirement: "User Login System - Longer requirement for wrapping and testing",
-        sub_requirements: [
-          { id: 101, sub_requirement: "Login via email/password" },
-          { id: 102, sub_requirement: "Forgot password functionality" },
-        ],
-      },
-      {
-        id: 2,
-        requirement: "Dashboard Features Overview",
-        sub_requirements: [
-          { id: 201, sub_requirement: "Show user stats" },
-          { id: 202, sub_requirement: "Display recent activities" },
-        ],
-      },
-      {
-        id: 3,
-        requirement: "Group Categories and Subcategories Management System",
-        sub_requirements: [
-          { id: 301, sub_requirement: "Allow users to select multiple categories" },
-          { id: 302, sub_requirement: "Implement real-time filtering of subcategories based on selection" },
-          { id: 303, sub_requirement: "Provide CRUD endpoints for admins to manage categories/subcategories" },
-        ],
-      },
-       {
-        id: 4,
-        requirement: "QR scanners for event tickets Implementation Details",
-        sub_requirements: [
-          { id: 401, sub_requirement: "Generate unique QR codes for each ticket, encoded with ticket_id and user details." },
-          { id: 402, sub_requirement: "Allow users to download their ticket (PDF/Image) with the QR code after purchase." },
-        ],
-      },
-    ];
-    //setRequirements(testData);
   }, []);
-
-  // The fetchRequirements and axios calls are kept but commented out
-  // Uncomment and implement if you need to connect to an API
 
   const fetchRequirements = async () => {
     try {
-    //   const res = await axios.get(`/api/requirement/${projectId}`);
-      const res = await requirementService.getAllWithSubRequirements(); // Adjusted to use the service
+      const res = await requirementService.getAllWithSubRequirements();
       setRequirements(res);
     } catch (err) {
       console.error("Failed to fetch requirements:", err);
     }
   };
 
-  // const handleSave = async (requirement: string) => {
-  //   try { /* ... axios.post call ... */
-  //      setShowModal(false);
-  //     // fetchRequirements();
-  //   } catch (err) { console.error("Failed to add requirement:", err); }
-  // };
-
-   // This function is triggered by Enter key or Save icon click on the inline input
-  // const handleAddSub = async (requirementId: number, text: string) => {
-  //   if (!text.trim()) return;
-  //   try { /* ... axios.post call ... */
-  //     // fetchRequirements();
-  //     setNewSubRequirementText((prev) => ({ ...prev, [requirementId]: "" })); // Clear input after successful save
-  //   } catch (err) { console.error("Failed to add sub-requirement:", err); }
-  // };
-
   const handleSave = async (requirementText: string) => {
     try {
-      const estimationId = 1; 
-      const createdBy = 101;  
-  
-      const newRequirement = await requirementService.create({
-        estimationId,
-        requirement: requirementText,
-        status: true, 
-        createdBy,
-        createdAt: ""
-      });
-  
-      // Append to list and refresh UI
-      setRequirements(prev => [...prev, { ...newRequirement, sub_requirements: [] }]);
+      const estimationId = 1;
+      const createdBy = 101;
+      const newRequirement = await requirementService.create(
+        {
+          estimationId,
+          requirement: requirementText,
+          status: true,
+          createdBy,
+          createdAt: "",
+        },
+        [] // Provide an empty array for sub-requirements
+      );
+
+      setRequirements((prev) => [...prev, { ...newRequirement, sub_requirements: [] }]);
     } catch (error) {
       console.error("Error saving requirement:", error);
     } finally {
       setShowModal(false);
     }
   };
-  
-  
 
-   // This function is triggered by Enter key or Save icon click on the inline input
   const handleAddSub = async (requirementId: number, text: string) => {
     if (!text.trim()) return;
-    console.log(`Adding sub-requirement (static data) "${text}" to requirement ${requirementId}`);
-
-     // Use Math.random() for unique id with static data
-    const newSub = { id: Math.random(), sub_requirement: text };
-
-    setRequirements(
-      requirements.map((req) =>
+    const createdBy = 101;
+    const newSubRequirement = await requirementService.createSubRequirement(requirementId, text, createdBy);
+    setRequirements((prev) =>
+      prev.map((req) =>
         req.id === requirementId
-          ? {
-              ...req,
-              sub_requirements: [
-                ...req.sub_requirements,
-                newSub
-              ],
-            }
+          ? { ...req, sub_requirements: [...req.sub_requirements, {id: newSubRequirement.id, sub_requirement: newSubRequirement.subrequirement}] }
           : req
       )
     );
-    // Clear the input field after adding
     setNewSubRequirementText((prev) => ({ ...prev, [requirementId]: "" }));
   };
 
@@ -149,16 +76,12 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
   };
 
   const handleDeleteRequirement = (requirementId: number) => {
-    console.log("Delete requirement (static data):", requirementId);
-     // For static data: Remove the requirement
-    setRequirements(requirements.filter((req) => req.id !== requirementId));
+    setRequirements((prev) => prev.filter((req) => req.id !== requirementId));
   };
 
   const handleDeleteSubRequirement = (requirementId: number, subRequirementId: number) => {
-    console.log(`Delete sub-requirement (static data) ${subRequirementId} from requirement ${requirementId}`);
-     // For static data: Remove the sub-requirement
-    setRequirements(
-      requirements.map((req) =>
+    setRequirements((prev) =>
+      prev.map((req) =>
         req.id === requirementId
           ? {
               ...req,
@@ -169,23 +92,9 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
     );
   };
 
-    // Placeholder Edit Handlers (functionality needs implementation)
-    // const handleEditRequirement = (requirementId: number) => {
-    //     console.log("Edit requirement clicked:", requirementId);
-    //     // Implement your edit logic here - e.g., show an input to edit the requirement text
-    //     alert(`Implement Edit functionality for Requirement ID: ${requirementId}`);
-    // };
-
-     const handleEditSubRequirement = (requirementId: number, subRequirementId: number) => {
-        console.log(`Edit sub-requirement clicked: ${subRequirementId} in requirement ${requirementId}`);
-         // Implement your edit logic here - e.g., show an editable input for this sub-requirement
-         alert(`Implement Edit functionality for Sub-Requirement ID: ${subRequirementId}`);
-    };
-
-    // Handler for the Cancel (X) button on the inline input
-    const handleCancelAddSub = (requirementId: number) => {
-        setNewSubRequirementText(prev => ({ ...prev, [requirementId]: '' })); // Clear the input
-    };
+  const handleCancelAddSub = (requirementId: number) => {
+    setNewSubRequirementText((prev) => ({ ...prev, [requirementId]: "" }));
+  };
 
   // --- End Placeholder/Static Data Logic ---
 
@@ -291,7 +200,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
                             <span className="text-gray-500 text-xs">•</span>
                             {/* EDIT ICON - Added for sub-requirements */}
                              <button
-                                onClick={() => handleEditSubRequirement(req.id, sub.id)}
+                                onClick={() => handleDeleteSubRequirement(req.id, sub.id)}
                                 className="text-blue-500 hover:text-blue-700 focus:outline-none text-lg"
                                 title="Edit Sub-Requirement"
                             >

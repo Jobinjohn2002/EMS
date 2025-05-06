@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Requirement } from '../requirement.entity';
 
 @Entity()
@@ -12,26 +20,24 @@ export class SubRequirement {
   @Column()
   subrequirement: string;
 
-  @Column()
-  description: string;
-
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: true })
   status: boolean;
 
   @Column({ name: 'created_by' })
   createdBy: number;
 
-  @Column({ name: 'created_at', type: 'datetime' })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
   @Column({ name: 'modified_by', nullable: true })
   modifiedBy?: number;
 
-  @Column({ name: 'modified_at', type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   modifiedAt?: Date;
 
-
-  @ManyToOne(() => Requirement, (req) => req.sub_requirements)
+  @ManyToOne(() => Requirement, (req) => req.sub_requirements, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'requirement_id' })
   requirement: Requirement;
 }

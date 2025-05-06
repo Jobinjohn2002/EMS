@@ -13,79 +13,23 @@ import Header, { LandingHeader } from "../components/Header";
 import { projectService } from "../services/projectService";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-// Define Omit type manually if not using type-fest (or import from type-fest)
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
-// Import your frontend Estimation model
 import { Estimation as FrontendEstimation } from '../models/Estimation';
 import EstimationTable from "../components/estimation/EstimationTable";
-
-// Define the type for the data payload expected by the backend create endpoint
-// This is based on your frontend model, omitting backend-managed fields
+import { toast } from "react-toastify";
 type CreateEstimationPayload = Omit<FrontendEstimation, 'id' | 'createdAt' | 'modifiedAt' | 'modifiedBy'>;
-
-
-// Define types for dropdown options for clarity
 interface ProjectOption {
   id: number;
   name: string;
 }
-
 interface StatusOption {
   id: number;
   label: string;
 }
-
 interface UserOption {
   id: number;
-  label: string; // Or maybe 'name', depends on your data structure
+  label: string; 
 }
-
-
-const mockData = [
-  {
-    id: 1,
-    projectName: "Similrz",
-    clientName: "Fabien",
-    managerName: "Gidhin Shaji",
-    projectType: "Internal",
-    logo: simLogo,
-  },
-  {
-    id: 2,
-    projectName: "Hilton",
-    clientName: "John",
-    managerName: "Gidhin Shaji",
-    projectType: "External",
-    logo: hilLogo,
-  },
-  {
-    id: 3,
-    projectName: "Complete Solar",
-    clientName: "Daniel",
-    managerName: "Gidhin Shaji",
-    projectType: "External",
-    logo: csLogo,
-  },
-  {
-    id: 4,
-    projectName: "Sanmina",
-    clientName: "Micheal",
-    managerName: "Suresh Venkatraman",
-    projectType: "External",
-    logo: sanLogo,
-  },
-  {
-    id: 5,
-    projectName: "KUBA",
-    clientName: "Jack",
-    managerName: "Gidhin Shaji",
-    projectType: "External",
-    logo: kbLogo,
-  },
-];
-
 const LandingPage: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [viewType, setViewType] = useState<"grid" | "list">("grid");
@@ -98,8 +42,6 @@ const LandingPage: React.FC = () => {
   const [versionNo, setVersionNo] = useState<string>('');
   const [approvedBy, setApprovedBy] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<number | null>(null);
-  // Note: 'preparedBy' is NOT nullable in your frontend model either.
-  // We'll use null for state initially, but validate before saving.
   const [selectedPreparedBy, setSelectedPreparedBy] = useState<number | null>(null);
   const [description, setDescription] = useState<string>('');
 
@@ -125,17 +67,13 @@ const LandingPage: React.FC = () => {
     }
   };
 
-  // Handles saving the form data using the frontend model types
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
-
-    // Validation based on the frontend model: preparedBy is required (number)
     if (selectedPreparedBy === null) {
       alert('Prepared by is required.');
       return;
     }
 
-    // Prepare the data payload matching the frontend CreateEstimationPayload type
     const estimationData: CreateEstimationPayload = {
       projectId: selectedProject ?? undefined, 
       versionNo: versionNo || undefined, 
@@ -144,7 +82,6 @@ const LandingPage: React.FC = () => {
       status: selectedStatus ?? undefined, 
       preparedBy: selectedPreparedBy, 
       description: description || undefined, 
-      // id, createdAt, modifiedAt, modifiedBy are omitted as per CreateEstimationPayload type
     };
 
     console.log('Attempting to save estimation:', estimationData);
@@ -162,18 +99,15 @@ const LandingPage: React.FC = () => {
       setSelectedStatus(null);
       setSelectedPreparedBy(null);
       setDescription('');
-
       togglePopup();
-
-      alert('Estimation saved successfully!');
-      navigate("/version-history");
-
-
+      toast.success('Estimation saved successfully!');
+      //navigate("/version-history");
     } catch (error) {
       console.error('Error saving estimation:', error);
+      toast.error('Error saving estimation');
       // --- Handle error ---
       // Show an error message to the user
-      alert(`Failed to save estimation. Please try again.\nError: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`Failed to save estimation. Please try again.\nError: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
   const fetchProjects = async () => {
@@ -188,7 +122,18 @@ const LandingPage: React.FC = () => {
   const handleEdit = (projectId: number) => {
     navigate(`/create-estimation/${projectId}`);
   };
-
+  const projectLogoMap: { [key: string]: string } = {
+    "Similrz": simLogo,
+    "Hilton": hilLogo,
+    "Complete Solar": csLogo,
+    "Sanmina": sanLogo,
+    "KUBA": kbLogo,
+  };
+  
+  // Helper function to get the logo based on project name
+  const getProjectLogo = (projectName: string): string => {
+    return projectLogoMap[projectName] || simLogo; 
+  };
   useEffect(() => {
     fetchProjects();
     projectService
@@ -446,20 +391,21 @@ const LandingPage: React.FC = () => {
 
         <div className="flex-1 overflow-auto">
           {viewType === "grid" ? (
-            <div className="flex flex-wrap gap-6">
-              {mockData.map((p) => (
-                <EstimationCard
-                  key={p.id}
-                  projectName={p.projectName}
-                  managerName={p.managerName}
-                  projectType={p.projectType}
-                  logo={p.logo}
-                  onClick={() =>
-                    navigate(`/project/${p.projectName}`)
-                  }
-                />
-              ))}
-            </div>
+             <div className="flex flex-wrap gap-6">
+             {/* *** MAP OVER THE 'projects' STATE HERE *** */}
+             {projects.map((project) => (
+               <EstimationCard
+                 key={project.id} 
+                 projectName={project.projectName} 
+                 managerName={project.managerName} 
+                 projectType={project.projectType} 
+                 logo={getProjectLogo(project.projectName)} 
+                 onClick={() =>
+                   navigate(`/project/${project.projectName}`)
+                 }
+               />
+             ))}
+           </div>
           ) : (
             <EstimationTable
               projects={projects}

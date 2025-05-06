@@ -16,6 +16,11 @@ export class ProjectController {
     const projects = await this.projectService.findAll();
     return projects.map(({ id, projectName }) => ({ id, projectName }));
 }
+  @Get('/projects-estimations')
+    async getProjectsWithEstimations() {
+    const projects = await this.projectService.getProjectsWithEstimations();
+    return projects;
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

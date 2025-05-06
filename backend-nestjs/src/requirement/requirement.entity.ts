@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { SubRequirement } from './subrequirement/sub-requirement.entity';
 
 @Entity()
@@ -18,15 +18,15 @@ export class Requirement {
   @Column({ name: 'created_by' })
   createdBy: number;
 
-  @Column({ name: 'created_at', type: 'datetime' })
+  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
   createdAt: Date;
 
   @Column({ name: 'modified_by', nullable: true })
   modifiedBy?: number;
 
-  @Column({ name: 'modified_at', type: 'datetime', nullable: true })
+  @UpdateDateColumn({ name: 'modified_at', type: 'datetime', nullable: true })
   modifiedAt?: Date;
 
-  @OneToMany(() => SubRequirement, (sub) => sub.requirement)
-  sub_requirements: SubRequirement[]
+  @OneToMany(() => SubRequirement, (sub) => sub.requirement, { cascade: true })
+  sub_requirements: SubRequirement[];
 }

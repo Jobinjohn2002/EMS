@@ -19,7 +19,8 @@ export const requirementService = {
   },
 
   create: async (requirement: Omit<Requirement, 'id'>): Promise<Requirement> => {
-    const response = await API.post('/requirement', requirement);
+    const { createdAt, modifiedAt, ...safeRequirement } = requirement;
+    const response = await API.post('/requirement', safeRequirement);
     return response.data;
   },
 
@@ -33,7 +34,6 @@ export const requirementService = {
   },
 
   // Sub Requirement
-
   getAllSubRequirements: async (): Promise<SubRequirement[]> => {
     const response = await API.get('/sub-requirement');
     return response.data;
@@ -44,8 +44,12 @@ export const requirementService = {
     return response.data;
   },
 
-  createSubRequirement: async (subRequirement: Omit<SubRequirement, 'id'>): Promise<SubRequirement> => {
-    const response = await API.post('/sub-requirement', subRequirement);
+  // Create sub-requirement
+  createSubRequirement: async (requirementId: number, text: string): Promise<SubRequirement> => {
+    const response = await API.post('/sub-requirement', {
+      requirementId, 
+      text
+    });
     return response.data;
   },
 
@@ -57,9 +61,6 @@ export const requirementService = {
   deleteSubRequirement: async (id: number): Promise<void> => {
     await API.delete(`/sub-requirement/${id}`);
   }
-
 };
 
 export default requirementService;
-
-//

@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Estimation } from 'src/estimation/estimation.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 @Entity()
 export class Project {
@@ -19,4 +20,8 @@ export class Project {
 
   @Column({ name: 'project_type', type: 'int', nullable: true })
   projectType?: number;
+
+  @OneToMany(() => Estimation, (e) => e.project)
+  estimations?: Estimation[];
+
 }

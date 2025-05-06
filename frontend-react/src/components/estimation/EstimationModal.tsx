@@ -6,25 +6,17 @@ import { estimationService } from '../../services/estimationService';
 interface EstimationModalProps {
   visible: boolean;
   onHide: () => void;
-//   onSubmit: (estimation: EstimationModel) => void;
 refreshProjects: () => Promise<void>; 
 }
 
-// const EstimationModal: React.FC<EstimationModalProps> = ({ visible, onHide, onSubmit }) => {
 const EstimationModal: React.FC<EstimationModalProps> = ({ visible, onHide, refreshProjects  }) => {
   const [estimation, setEstimation] = useState<Partial<EstimationModel>>({
     projectType: 'Eseresi',
-    // status: 'Draft',
     date: new Date().toISOString().split('T')[0]
   });
 
   const statusOptions = ['Draft', 'Submitted', 'Approved', 'Rejected'];
 
-//   const handleSubmit = (e: React.FormEvent) => {
-//     e.preventDefault();
-//     onSubmit(estimation as EstimationModel);
-//     onHide();
-//   };
 const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {

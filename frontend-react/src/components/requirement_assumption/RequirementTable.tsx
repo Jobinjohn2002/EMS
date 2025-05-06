@@ -95,19 +95,29 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
   //   } catch (err) { console.error("Failed to add sub-requirement:", err); }
   // };
 
-
-  // --- Placeholder/Static Data Logic (Replace with API calls when ready) ---
-  const handleSave = async (requirement: string) => {
-    console.log("Saving requirement (static data):", requirement);
-    // Use Math.random() for unique id with static data
-    const newReq = {
-      id: Math.random(),
-      requirement: requirement,
-      sub_requirements: [],
-    };
-    setRequirements([...requirements, newReq]);
-    setShowModal(false);
+  const handleSave = async (requirementText: string) => {
+    try {
+      const estimationId = 1; 
+      const createdBy = 101;  
+  
+      const newRequirement = await requirementService.create({
+        estimationId,
+        requirement: requirementText,
+        status: true, 
+        createdBy,
+        createdAt: ""
+      });
+  
+      // Append to list and refresh UI
+      setRequirements(prev => [...prev, { ...newRequirement, sub_requirements: [] }]);
+    } catch (error) {
+      console.error("Error saving requirement:", error);
+    } finally {
+      setShowModal(false);
+    }
   };
+  
+  
 
    // This function is triggered by Enter key or Save icon click on the inline input
   const handleAddSub = async (requirementId: number, text: string) => {

@@ -19,6 +19,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [editingRequirement, setEditingRequirement] = useState<Requirement | null>(null);
   const [newSubRequirementText, setNewSubRequirementText] = useState<{ [key: number]: string }>({});
   // Optional: state to track which requirement/sub-requirement is being edited
   // const [editingRequirementId, setEditingRequirementId] = useState<number | null>(null);
@@ -54,7 +55,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
           { id: 303, sub_requirement: "Provide CRUD endpoints for admins to manage categories/subcategories" },
         ],
       },
-       {
+      {
         id: 4,
         requirement: "QR scanners for event tickets Implementation Details",
         sub_requirements: [
@@ -71,7 +72,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
 
   const fetchRequirements = async () => {
     try {
-    //   const res = await axios.get(`/api/requirement/${projectId}`);
+      //   const res = await axios.get(`/api/requirement/${projectId}`);
       const res = await requirementService.getAllWithSubRequirements(); // Adjusted to use the service
       setRequirements(res);
     } catch (err) {
@@ -86,7 +87,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
   //   } catch (err) { console.error("Failed to add requirement:", err); }
   // };
 
-   // This function is triggered by Enter key or Save icon click on the inline input
+  // This function is triggered by Enter key or Save icon click on the inline input
   // const handleAddSub = async (requirementId: number, text: string) => {
   //   if (!text.trim()) return;
   //   try { /* ... axios.post call ... */
@@ -97,17 +98,17 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
 
   const handleSave = async (requirementText: string) => {
     try {
-      const estimationId = 1; 
-      const createdBy = 101;  
-  
+      const estimationId = 1;
+      const createdBy = 101;
+
       const newRequirement = await requirementService.create({
         estimationId,
         requirement: requirementText,
-        status: true, 
+        status: true,
         createdBy,
         createdAt: ""
       });
-  
+
       // Append to list and refresh UI
       setRequirements(prev => [...prev, { ...newRequirement, sub_requirements: [] }]);
     } catch (error) {
@@ -116,27 +117,27 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
       setShowModal(false);
     }
   };
-  
-  
 
-   // This function is triggered by Enter key or Save icon click on the inline input
+
+
+  // This function is triggered by Enter key or Save icon click on the inline input
   const handleAddSub = async (requirementId: number, text: string) => {
     if (!text.trim()) return;
     console.log(`Adding sub-requirement (static data) "${text}" to requirement ${requirementId}`);
 
-     // Use Math.random() for unique id with static data
+    // Use Math.random() for unique id with static data
     const newSub = { id: Math.random(), sub_requirement: text };
 
     setRequirements(
       requirements.map((req) =>
         req.id === requirementId
           ? {
-              ...req,
-              sub_requirements: [
-                ...req.sub_requirements,
-                newSub
-              ],
-            }
+            ...req,
+            sub_requirements: [
+              ...req.sub_requirements,
+              newSub
+            ],
+          }
           : req
       )
     );
@@ -150,42 +151,57 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
 
   const handleDeleteRequirement = (requirementId: number) => {
     console.log("Delete requirement (static data):", requirementId);
-     // For static data: Remove the requirement
+    // For static data: Remove the requirement
     setRequirements(requirements.filter((req) => req.id !== requirementId));
   };
 
   const handleDeleteSubRequirement = (requirementId: number, subRequirementId: number) => {
     console.log(`Delete sub-requirement (static data) ${subRequirementId} from requirement ${requirementId}`);
-     // For static data: Remove the sub-requirement
+    // For static data: Remove the sub-requirement
     setRequirements(
       requirements.map((req) =>
         req.id === requirementId
           ? {
-              ...req,
-              sub_requirements: req.sub_requirements.filter((sub) => sub.id !== subRequirementId),
-            }
+            ...req,
+            sub_requirements: req.sub_requirements.filter((sub) => sub.id !== subRequirementId),
+          }
           : req
       )
     );
   };
 
-    // Placeholder Edit Handlers (functionality needs implementation)
-    // const handleEditRequirement = (requirementId: number) => {
-    //     console.log("Edit requirement clicked:", requirementId);
-    //     // Implement your edit logic here - e.g., show an input to edit the requirement text
-    //     alert(`Implement Edit functionality for Requirement ID: ${requirementId}`);
-    // };
+  const handleEditSave = async (id: number, updatedText: string) => {
+    try {
+      await requirementService.update(id, { requirement: updatedText }); // assuming update method exists
+      setRequirements(reqs =>
+        reqs.map(r => r.id === id ? { ...r, requirement: updatedText } : r)
+      );
+    } catch (err) {
+      console.error("Failed to update requirement:", err);
+    } finally {
+      setShowEditModal(false);
+      setEditingRequirement(null);
+    }
+  };
 
-     const handleEditSubRequirement = (requirementId: number, subRequirementId: number) => {
-        console.log(`Edit sub-requirement clicked: ${subRequirementId} in requirement ${requirementId}`);
-         // Implement your edit logic here - e.g., show an editable input for this sub-requirement
-         alert(`Implement Edit functionality for Sub-Requirement ID: ${subRequirementId}`);
-    };
 
-    // Handler for the Cancel (X) button on the inline input
-    const handleCancelAddSub = (requirementId: number) => {
-        setNewSubRequirementText(prev => ({ ...prev, [requirementId]: '' })); // Clear the input
-    };
+  // Placeholder Edit Handlers (functionality needs implementation)
+  // const handleEditRequirement = (requirementId: number) => {
+  //     console.log("Edit requirement clicked:", requirementId);
+  //     // Implement your edit logic here - e.g., show an input to edit the requirement text
+  //     alert(`Implement Edit functionality for Requirement ID: ${requirementId}`);
+  // };
+
+  const handleEditSubRequirement = (requirementId: number, subRequirementId: number) => {
+    console.log(`Edit sub-requirement clicked: ${subRequirementId} in requirement ${requirementId}`);
+    // Implement your edit logic here - e.g., show an editable input for this sub-requirement
+    alert(`Implement Edit functionality for Sub-Requirement ID: ${subRequirementId}`);
+  };
+
+  // Handler for the Cancel (X) button on the inline input
+  const handleCancelAddSub = (requirementId: number) => {
+    setNewSubRequirementText(prev => ({ ...prev, [requirementId]: '' })); // Clear the input
+  };
 
   // --- End Placeholder/Static Data Logic ---
 
@@ -210,13 +226,18 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
         onSave={handleSave}
       />
 
-      <EditMilestoneModal
-        isOpen={showEditModal}
-        title="Edit Requirement" // Title can be adjusted if needed
-        placeholder="Enter requirement"
-        onClose={() => setShowEditModal(false)}
-        onSave={handleSave}
-      />
+      {editingRequirement && (
+        <EditMilestoneModal
+          isOpen={showEditModal}
+          title="Edit Requirement"
+          placeholder="Enter requirement"
+          defaultValue={editingRequirement.requirement}
+          onClose={() => setShowEditModal(false)}
+          onSave={(text) => handleEditSave(editingRequirement.id, text)}
+        />
+      )}
+
+
 
       {/* Table */}
       <div className="bg-white shadow rounded-xl overflow-hidden"> {/* Wrapper for rounded corners */}
@@ -238,44 +259,47 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
                 <tr className="hover:bg-gray-100"> {/* Hover effect */}
                   <td className="px-4 py-3 flex items-center space-x-2"> {/* Centered icons */}
                     {/* Expand/Collapse Button */}
-                     <button
-                       onClick={() => setExpandedId(expandedId === req.id ? null : req.id)}
-                       className="text-gray-500 hover:text-gray-700 focus:outline-none text-lg" // Icon styling
-                        title={expandedId === req.id ? "Collapse" : "Expand"}
-                     >
-                       {expandedId === req.id ? (
-                         // Minus icon for collapsed
-                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                         </svg>
-                       ) : (
-                         // Plus icon for expanded
-                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                         </svg>
-                       )}
-                     </button>
-                     {/* EDIT ICON - Added */}
                     <button
-                        onClick={() => setShowEditModal(true)}
-                        className="text-blue-500 hover:text-blue-700 focus:outline-none text-lg"
-                        title="Edit Requirement"
+                      onClick={() => setExpandedId(expandedId === req.id ? null : req.id)}
+                      className="text-gray-500 hover:text-gray-700 focus:outline-none text-lg" // Icon styling
+                      title={expandedId === req.id ? "Collapse" : "Expand"}
                     >
+                      {expandedId === req.id ? (
+                        // Minus icon for collapsed
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                         </svg>
+                      ) : (
+                        // Plus icon for expanded
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                      )}
+                    </button>
+                    {/* EDIT ICON - Added */}
+                    <button
+                      onClick={() => {
+                        setEditingRequirement(req);
+                        setShowEditModal(true);
+                      }}
+                      className="text-blue-500 hover:text-blue-700 focus:outline-none text-lg"
+                      title="Edit Requirement"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
                     </button>
                     {/* DELETE ICON - Ensured correct placement */}
-                     <button
-                       onClick={() => handleDeleteRequirement(req.id)}
-                       className="text-red-500 hover:text-red-700 focus:outline-none text-lg"
-                       title="Delete Requirement"
-                     >
-                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                       </svg>
-                     </button>
-                   </td>
+                    <button
+                      onClick={() => handleDeleteRequirement(req.id)}
+                      className="text-red-500 hover:text-red-700 focus:outline-none text-lg"
+                      title="Delete Requirement"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </td>
                   {/* Added break-words to help prevent overflow collapsing column */}
                   <td className="px-4 py-3 font-medium text-gray-900 break-words">{req.requirement}</td>
                 </tr>
@@ -286,29 +310,29 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
                     {req.sub_requirements.map((sub) => (
                       <tr key={sub.id} className="bg-gray-50 hover:bg-gray-100"> {/* Light background for sub-rows */}
                         <td className="px-4 py-3 flex items-center space-x-2 w-12 pl-8"> {/* Indentation and icons */}
-                            {/* Bullet or arrow icon for sub-item visualization */}
-                            {/* Using a simple dot for now, you could use an arrow like the previous version if preferred */}
-                            <span className="text-gray-500 text-xs">•</span>
-                            {/* EDIT ICON - Added for sub-requirements */}
-                             <button
-                                onClick={() => handleEditSubRequirement(req.id, sub.id)}
-                                className="text-blue-500 hover:text-blue-700 focus:outline-none text-lg"
-                                title="Edit Sub-Requirement"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
-                            </button>
-                            {/* DELETE ICON - Ensured correct placement */}
-                             <button
-                               onClick={() => handleDeleteSubRequirement(req.id, sub.id)}
-                               className="text-red-500 hover:text-red-700 focus:outline-none text-lg"
-                               title="Delete Sub-Requirement"
-                             >
-                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                               </svg>
-                             </button>
+                          {/* Bullet or arrow icon for sub-item visualization */}
+                          {/* Using a simple dot for now, you could use an arrow like the previous version if preferred */}
+                          <span className="text-gray-500 text-xs">•</span>
+                          {/* EDIT ICON - Added for sub-requirements */}
+                          <button
+                            onClick={() => handleEditSubRequirement(req.id, sub.id)}
+                            className="text-blue-500 hover:text-blue-700 focus:outline-none text-lg"
+                            title="Edit Sub-Requirement"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                          </button>
+                          {/* DELETE ICON - Ensured correct placement */}
+                          <button
+                            onClick={() => handleDeleteSubRequirement(req.id, sub.id)}
+                            className="text-red-500 hover:text-red-700 focus:outline-none text-lg"
+                            title="Delete Sub-Requirement"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
                         </td>
                         {/* Added break-words */}
                         <td className="px-4 py-3 text-sm text-gray-600 break-words">{sub.sub_requirement}</td>
@@ -317,46 +341,46 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ projectId }) => {
 
                     {/* Inline Sub-Requirement Add Input Row */}
                     <tr className="bg-gray-50 hover:bg-gray-100">
-                       <td className="px-4 py-3 w-12 pl-8"> {/* Indentation */}
-                          {/* Optional: Add a '+' icon or similar here if desired */}
-                       </td>
-                       <td className="px-4 py-3 flex items-center space-x-2"> {/* Use flex to align input and buttons */}
-                         <input
-                           type="text"
-                           className="border border-gray-300 px-3 py-1 rounded-md w-full text-sm text-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="Enter sub-requirement and press Enter"
-                           value={newSubRequirementText[req.id] || ''}
-                           onChange={(e) => handleInputChange(req.id, e.target.value)}
-                            // Trigger add on Enter key
-                           onKeyDown={(e) => {
-                             if (e.key === "Enter") {
-                               const value = (e.target as HTMLInputElement).value;
-                               handleAddSub(req.id, value);
-                             }
-                           }}
-                         />
-                         {/* SAVE (TICK) ICON - Added */}
+                      <td className="px-4 py-3 w-12 pl-8"> {/* Indentation */}
+                        {/* Optional: Add a '+' icon or similar here if desired */}
+                      </td>
+                      <td className="px-4 py-3 flex items-center space-x-2"> {/* Use flex to align input and buttons */}
+                        <input
+                          type="text"
+                          className="border border-gray-300 px-3 py-1 rounded-md w-full text-sm text-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Enter sub-requirement and press Enter"
+                          value={newSubRequirementText[req.id] || ''}
+                          onChange={(e) => handleInputChange(req.id, e.target.value)}
+                          // Trigger add on Enter key
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              const value = (e.target as HTMLInputElement).value;
+                              handleAddSub(req.id, value);
+                            }
+                          }}
+                        />
+                        {/* SAVE (TICK) ICON - Added */}
                         <button
-                            onClick={() => handleAddSub(req.id, newSubRequirementText[req.id] || '')}
-                            className="text-green-500 hover:text-green-700 focus:outline-none text-lg"
-                            title="Save Sub-Requirement"
-                            disabled={!newSubRequirementText[req.id]?.trim()} // Disable if input is empty
+                          onClick={() => handleAddSub(req.id, newSubRequirementText[req.id] || '')}
+                          className="text-green-500 hover:text-green-700 focus:outline-none text-lg"
+                          title="Save Sub-Requirement"
+                          disabled={!newSubRequirementText[req.id]?.trim()} // Disable if input is empty
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
                         </button>
                         {/* CANCEL (X) ICON - Added and wired up */}
-                         <button
-                            onClick={() => handleCancelAddSub(req.id)}
-                            className="text-gray-500 hover:text-gray-700 focus:outline-none text-lg"
-                            title="Cancel"
-                         >
-                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                             </svg>
+                        <button
+                          onClick={() => handleCancelAddSub(req.id)}
+                          className="text-gray-500 hover:text-gray-700 focus:outline-none text-lg"
+                          title="Cancel"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
                         </button>
-                       </td>
+                      </td>
                     </tr>
                   </>
                 )}

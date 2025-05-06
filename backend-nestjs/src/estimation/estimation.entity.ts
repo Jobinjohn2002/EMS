@@ -7,8 +7,8 @@ export class Estimation {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'project_id', type: 'int' })
-  projectId: number;
+  @Column({ name: 'project_id', type: 'int', nullable: true  })
+  projectId?: number;
   
   @Column({ type: 'date', nullable: true })
   date?: Date;

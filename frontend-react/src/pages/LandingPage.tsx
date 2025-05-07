@@ -120,7 +120,7 @@ const LandingPage: React.FC = () => {
   };
 
   const handleEdit = (projectId: number) => {
-    navigate(`/create-estimation/${projectId}`);
+    navigate(`/create/${projectId}`);
   };
   const projectLogoMap: { [key: string]: string } = {
     "Similrz": simLogo,

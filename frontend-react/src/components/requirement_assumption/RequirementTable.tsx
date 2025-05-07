@@ -164,7 +164,7 @@ const RequirementTable: React.FC<{ projectId: string }> = ({ }) => {
       <div className="flex justify-end">
         <button
           onClick={() => setShowModal(true)}
-          className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors ml-auto"
+          className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors ml-auto w-[160px] h-[32px] text-sm font-semibold flex items-center justify-center"
         >
           + Create Milestone
         </button>

@@ -33,7 +33,7 @@ export const requirementService = {
   update: async (
     id: number, 
     requirement: Partial<Requirement>, 
-    subRequirements: Omit<SubRequirement, 'id' | 'requirement'>[] // SubRequirements to be updated
+    subRequirements?: Omit<SubRequirement, 'id' | 'requirement'>[] // SubRequirements to be updated
   ): Promise<Requirement> => {
     const response = await API.put(`/requirement/${id}`, {
       ...requirement,

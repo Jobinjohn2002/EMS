@@ -27,7 +27,7 @@ const ProjectsDashboard: React.FC = () => {
           onClick={() => handleCardClick(project.id)}
           className="cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-lg transition p-6 border border-gray-200"
         >
-          <h2 className="text-xl font-semibold">{project.name}</h2>
+          <h2 className="text-xl">{project.name}</h2>
           <p className="text-gray-500 mt-2">{project.description}</p>
         </div>
       ))}

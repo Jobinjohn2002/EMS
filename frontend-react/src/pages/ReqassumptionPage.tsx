@@ -6,12 +6,6 @@ import ClarificationTable from "../components/requirement_assumption/Clarificati
 // import AssumptionTable from "../components/assumption/AssumptionTable";
 // import OutOfScopeTable from "../components/outofscope/OutOfScopeTable";
 
-const tabs = ["Requirement", "Clarification", "Assumption", "Out of Scope"];
-
-const ReqassumptionPage: React.FC = () => {
-  const { projectId } = useParams<{ projectId: string }>();
-  const [activeTab, setActiveTab] = useState(tabs[0]);
-
   return (
     <div className="min-h-screen p-6 bg-gray-100">
       <Header />
